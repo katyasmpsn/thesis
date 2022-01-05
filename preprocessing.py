@@ -70,7 +70,11 @@ def textCleaning(rawtext):
 df["noteText"] = df["noteText"].apply(textCleaning)
 df["tweetText"] = df["tweetText"].apply(textCleaning)
 
-# writing clraned data to a file
+# creating a column with a list of words for each text snippet so that it's easier to to calculate term frequencies over the corpus
+df["noteTextList"] = df["noteText"].str.lower().str.split()
+df = df[~df["noteTextList"].isnull()]  # why are there empty notes at this point?
+
+# writing cleaned data to a file
 cleaned_data = open(cleaned_data_filename, "w")
 df.to_csv(cleaned_data)
 cleaned_data.close()
