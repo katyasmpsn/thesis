@@ -15,7 +15,7 @@ import sys
 # The raw files are passed in from the command line
 notes_filename = sys.argv[1]
 hydrated_tweets_filename = sys.argv[2]
-cleaned_data_filename = sys.argv[3]
+# cleaned_data_filename = sys.argv[3] # output file should always be named the same?
 
 notes = open(notes_filename, "r")
 hydrated_tweets = open(hydrated_tweets_filename, "r")
@@ -62,6 +62,7 @@ def textCleaning(rawtext):
     tokens = [x for x in tokens if not re.search(url_pattern, x)]
     # TODO: check if Sia et al omitted stopwords here? On first read they did, but BERT would likely pick up on the
     # TODO: unnaturalness. Uncomment the line below if they should be omitted
+    # TODO: but now i'm wondering if stop words will fuck with the corpus stats. ask shane
     # tokens = [x for x in tokens if x not in stopwords.words('english')]
 
     return " ".join(tokens)
@@ -75,6 +76,6 @@ df["noteTextList"] = df["noteText"].str.lower().str.split()
 df = df[~df["noteTextList"].isnull()]  # why are there empty notes at this point?
 
 # writing cleaned data to a file
-cleaned_data = open(cleaned_data_filename, "w")
+cleaned_data = open("cleaned_data.csv", "w")
 df.to_csv(cleaned_data)
 cleaned_data.close()
