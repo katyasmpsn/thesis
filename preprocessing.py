@@ -11,6 +11,7 @@ import pandas as pd
 from nltk.tokenize import TweetTokenizer
 import re
 import sys
+import numpy as np
 
 # The raw files are passed in from the command line
 notes_filename = sys.argv[1]
@@ -73,7 +74,9 @@ df["tweetText"] = df["tweetText"].apply(textCleaning)
 
 # creating a column with a list of words for each text snippet so that it's easier to to calculate term frequencies over the corpus
 df["noteTextList"] = df["noteText"].str.lower().str.split()
-df = df[~df["noteTextList"].isnull()]  # why are there empty notes at this point?
+# take only
+mask = (df['noteTextList'].str.len() > 0)
+df = df.loc[mask]
 
 # writing cleaned data to a file
 cleaned_data = open("cleaned_data.csv", "w")

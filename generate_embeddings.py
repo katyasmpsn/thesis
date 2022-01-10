@@ -6,6 +6,7 @@ Then the embeddings are averaged over each word type.
 import torch
 from transformers import BertTokenizerFast, BertModel
 import pandas as pd
+import itertools
 
 model = BertModel.from_pretrained("bert-base-uncased")
 t = BertTokenizerFast.from_pretrained("bert-base-uncased")
@@ -23,7 +24,6 @@ def getTokenEmbeddings(t1):
 
     # this is possibly bad coding, `t` and `model` were instantiated outside of this function
     # in the first code block
-
     tokens = t(t1, return_attention_mask=False, return_token_type_ids=False)
     words_ids = tokens.word_ids()
 
@@ -45,9 +45,26 @@ def getTokenEmbeddings(t1):
 
 
 df = pd.read_csv("cleaned_data.csv")
-small_df = df.head(100)
-strings = small_df.noteText.tolist()
-embeddings = [getTokenEmbeddings(x) for x in strings]
+
+# chunking
+# https://stackoverflow.com/questions/44729727/pandas-slice-large-dataframe-into-chunks
+n = 500  #chunk row size
+list_df = [df[i:i+n] for i in range(0,df.shape[0],n)]
+# len(list_df) = 35
+
+def generateEmbeddings(small_df):
+    strings = small_df.noteText.tolist()
+    embeddings = [getTokenEmbeddings(x) for x in strings]
+    return embeddings
+
+all_embeds = [] #2D list of chunk results
+for i in range(len(list_df)):
+    print("chunk {0}/35".format(i))
+
+    embeds = generateEmbeddings(list_df[i])
+    all_embeds.append(embeds)
+
+embeddings = list(itertools.chain(*all_embeds))
 
 # just a toy function for now, but it's creating a master dictionary for the vocab.
 # in the example: "look" is used twice, and is in two separate dictionaries in `text`.
@@ -84,4 +101,8 @@ embeddings = [detach_embedding(x) for x in embeddings]
 
 X = pd.DataFrame(embeddings)
 
-X.to_csv("embeddings.csv")
+outfile = "embeddings.csv"
+of = open(outfile)
+X.to_csv(of)
+
+of.close()
