@@ -97,13 +97,10 @@ for key in d.keys():
 def detach_embedding(x):
     return x[0].detach().numpy()
 
-
-embeddings = d.values()
-embeddings = [detach_embedding(x) for x in embeddings]
-
-X = pd.DataFrame(embeddings)
+d = {k: detach_embedding(v) for k, v in d.items()}
+embeddings = pd.DataFrame.from_dict(d)
 
 outfile = "embeddings.csv"
 of = open(outfile, 'w')
-X.to_csv(of)
+embeddings.to_csv(of)
 of.close()
