@@ -58,8 +58,11 @@ def generateEmbeddings(small_df):
     return embeddings
 
 all_embeds = [] #2D list of chunk results
-for i in range(len(list_df)):
-    print("chunk {0}/35".format(i))
+# for i in range(len(list_df)):
+# change me before moving to Patas for a full run!
+for i in range(1):
+    print("chunk {0}/35".format
+          (i))
 
     embeds = generateEmbeddings(list_df[i])
     all_embeds.append(embeds)
@@ -91,7 +94,6 @@ for key in d.keys():
 
 # detach takes out the grad requirement from the tensor
 
-
 def detach_embedding(x):
     return x[0].detach().numpy()
 
@@ -102,7 +104,6 @@ embeddings = [detach_embedding(x) for x in embeddings]
 X = pd.DataFrame(embeddings)
 
 outfile = "embeddings.csv"
-of = open(outfile)
+of = open(outfile, 'w')
 X.to_csv(of)
-
 of.close()
