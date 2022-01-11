@@ -44,7 +44,7 @@ def getTokenEmbeddings(t1):
     return res
 
 
-df = pd.read_csv("cleaned_data.csv")
+df = pd.read_csv("../results/cleaned_data.csv")
 
 # chunking
 # https://stackoverflow.com/questions/44729727/pandas-slice-large-dataframe-into-chunks
@@ -100,7 +100,7 @@ def detach_embedding(x):
 d = {k: detach_embedding(v) for k, v in d.items()}
 embeddings = pd.DataFrame.from_dict(d)
 
-outfile = "embeddings.csv"
+outfile = "../results/embeddings.csv"
 of = open(outfile, 'w')
 embeddings.to_csv(of)
 of.close()

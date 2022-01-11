@@ -9,7 +9,7 @@ from ast import literal_eval
 
 try:
     # TODO: update this to read in a filename that's passed in as an arg
-    df = pd.read_csv("cleaned_data.csv")
+    df = pd.read_csv("../results/cleaned_data.csv")
     # when reading in the df, the list of words is evaluated as a string so we need literal eval to
     # make it into a list again
     df["noteTextList"] = df["noteTextList"].apply(literal_eval)
@@ -22,7 +22,7 @@ try:
     }
     vocab_counts = pd.DataFrame.from_dict(vocab_counts, orient="index", columns=["tf"])
     # write out to a file in the main dir
-    vocab_counts.to_csv("vocab_counts.csv")
+    vocab_counts.to_csv("../results/vocab_counts.csv")
 
 except:
     print("Couldn't find cleaned_data.csv. Check that preprocessing.py ran ")

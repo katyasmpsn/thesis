@@ -79,6 +79,6 @@ mask = (df['noteTextList'].str.len() > 0)
 df = df.loc[mask]
 
 # writing cleaned data to a file
-cleaned_data = open("cleaned_data.csv", "w")
+cleaned_data = open("../results/cleaned_data.csv", "w")
 df.to_csv(cleaned_data)
 cleaned_data.close()
