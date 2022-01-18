@@ -4,19 +4,18 @@ Then the embeddings are averaged over each word type.
 """
 
 import torch
-from transformers import BertTokenizerFast, BertModel
+from transformers import BertTokenizerFast, BertModel, logging
 import pandas as pd
+import gc
 import itertools
 import sys
+logging.set_verbosity_error()
+# clean_data = sys.argv[1]
+# outfile = sys.argv[2]
 
-clean_data = sys.argv[1]
-outfile = sys.argv[2]
+clean_data = "data/cleaned_data.csv"
+outfile = "results/debug_embeddings.csv"
 
-# clean_data = "data/cleaned_data.csv"
-# outfile = "results/debug_embeddings.csv"
-
-model = BertModel.from_pretrained("bert-base-uncased")
-t = BertTokenizerFast.from_pretrained("bert-base-uncased")
 
 
 def getTokenEmbeddings(t1):
@@ -29,10 +28,15 @@ def getTokenEmbeddings(t1):
     {token : 1x768 vector}
     """
 
+    model = BertModel.from_pretrained("bert-base-uncased")
+    t = BertTokenizerFast.from_pretrained("bert-base-uncased")
+
     # this is possibly bad coding, `t` and `model` were instantiated outside of this function
     # in the first code block
     tokens = t(t1, return_attention_mask=False, return_token_type_ids=False)
     words_ids = tokens.word_ids()
+    if len(words_ids) > 512:
+        print("wait why did it tokenize it like this???")
 
     encoded_input = t(t1, return_tensors="pt")
     output = model(**encoded_input)
@@ -44,8 +48,10 @@ def getTokenEmbeddings(t1):
     reduced_states = torch.matmul(
         torch.from_numpy(wi_d.values.astype("float32")), squeezed_states
     )
-
     words = t1.split()
+
+    # Clean up objects
+    del model, t, squeezed_states, wi_d
 
     res = {words[i]: reduced_states[i] for i in range(len(words))}
     return res
@@ -55,35 +61,41 @@ clean_file = open(clean_data)
 df = pd.read_csv(clean_file)
 clean_file.close()
 
+print(df.shape)
 # omit sequences with more than 512 tokens according to
 # https://proceedings.neurips.cc/paper/2020/file/96671501524948bc3937b4b30d0e57b9-Paper.pdf
 
 df = df[df["noteTextList"].apply(lambda x: len(x) < 512)]
 # chunking
 # https://stackoverflow.com/questions/44729727/pandas-slice-large-dataframe-into-chunks
-# n = 100  #chunk row size
-# list_df = [df[i:i+n] for i in range(0,df.shape[0],n)]
 
-df["embeddings"] = df["noteText"].apply(lambda x: getTokenEmbeddings(x))
+n = 10  #chunk row size
+list_df = [df[i:i+n] for i in range(0,df.shape[0],n)]
+
 
 # def generateEmbeddings(small_df):
 #     strings = small_df.noteText.tolist() # don't make a list , just get the embeddings for each df row?
 #     embeddings = [getTokenEmbeddings(x) for x in strings]
 #     return embeddings
-#
-# all_embeds = [] #2D list of chunk results
-# # for i in range(len(list_df)):
-# # change me before moving to Patas for a full run!
-# for i in range(1):
-#     print("chunk {0}/35".format
-#           (i))
-#
-#     embeds = generateEmbeddings(list_df[i])
-#     all_embeds.append(embeds)
+
+all_embeds = [] #2D list of chunk results
+# for i in range(len(list_df)):
+# change me before moving to Patas for a full run!
+for i in range(2):
+    print("chunk {0}/{1}".format
+          (i, len(list_df)))
+
+    list_df[i]["embeddings"] = list_df[i]["noteText"].apply(lambda x: getTokenEmbeddings(x))
+    gc.collect()
+
+    all_embeds.append(list_df[i])
 #
 # embeddings = list(itertools.chain(*all_embeds))
 
-embeddings = df["embeddings"].tolist()
+concat_results = pd.concat(all_embeds)
+embeddings = concat_results["embeddings"].tolist()
+
+print("The length of vocab is {}".format(len(embeddings)))
 
 # just a toy function for now, but it's creating a master dictionary for the vocab.
 # in the example: "look" is used twice, and is in two separate dictionaries in `text`.
