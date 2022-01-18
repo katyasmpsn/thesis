@@ -1,6 +1,6 @@
 import pandas as pd
 
-df = pd.read_csv("clusters_pca_500.csv")
+df = pd.read_csv("embeddings_patas_jan18.csv")
 
 def str_cat(x):
     """
