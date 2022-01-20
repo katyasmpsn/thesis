@@ -108,9 +108,9 @@ if 'np_embeds' in globals():
     # TODO: what is up with np_embeds?
     del np_embeds
 
-for i in range(len(list_df)):
+# for i in range(len(list_df)):
 # or use smaller range below for local debugging
-#for i in range(2):
+for i in range(2):
     print("chunk {0}/{1}".format
           (i, len(list_df)))
 
