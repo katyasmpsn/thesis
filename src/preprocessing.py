@@ -74,11 +74,13 @@ df["tweetText"] = df["tweetText"].apply(textCleaning)
 
 # creating a column with a list of words for each text snippet so that it's easier to to calculate term frequencies over the corpus
 df["noteTextList"] = df["noteText"].str.lower().str.split()
-# take only
-mask = (df['noteTextList'].str.len() > 0)
+df["tweetTextList"] = df["tweetText"].str.lower().str.split()
+
+# take out empty lists
+mask = ((df['noteTextList'].str.len() > 0) & (df['tweetTextList'].str.len() > 0))
 df = df.loc[mask]
 
 # writing cleaned data to a file
-cleaned_data = open("../results/cleaned_data.csv", "w")
+cleaned_data = open("results/cleaned_data.csv", "w")
 df.to_csv(cleaned_data)
 cleaned_data.close()

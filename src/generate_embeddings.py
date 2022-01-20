@@ -16,10 +16,21 @@ logging.set_verbosity_error()
 # use the two lines below for use on Patas
 # clean_data = sys.argv[1]
 # outfile = sys.argv[2]
+# type = sys.argv[3]
 
 # use the two lines below for debugging locally
 clean_data = "data/cleaned_data.csv"
 outfile = "results/debug_embeddings.csv"
+type = "notes"
+
+if type == "notes":
+    typeList = "noteText"
+    typeText = "noteTextList"
+elif type == "tweets":
+    typeList = "tweetText"
+    typeText = "tweetTextList"
+else:
+    raise Exception("Invalid type: please choose 'tweets' or 'notes'")
 
 
 def getTokenEmbeddings(t1, model, t):
@@ -108,7 +119,7 @@ print(df.shape)
 
 # omit sequences with more than 512 tokens according to
 # https://proceedings.neurips.cc/paper/2020/file/96671501524948bc3937b4b30d0e57b9-Paper.pdf
-df = df[df["noteTextList"].apply(lambda x: len(x) < 512)]
+df = df[df[typeList].apply(lambda x: len(x) < 512)]
 
 # chunking
 # https://stackoverflow.com/questions/44729727/pandas-slice-large-dataframe-into-chunks
@@ -136,7 +147,7 @@ for i in range(2):
 
     # Extract embeddings from the words
     embeddings_loc = (
-        list_df[i]["noteText"].apply(lambda x: getTokenEmbeddingsLoc(x)).to_list()
+        list_df[i][typeText].apply(lambda x: getTokenEmbeddingsLoc(x)).to_list()
     )
 
     # Collapse embeddings into a numpy array
