@@ -8,14 +8,18 @@ from transformers import BertTokenizerFast, BertModel, logging
 import pandas as pd
 import gc
 import numpy as np
-import itertools
 import sys
-logging.set_verbosity_error()
-clean_data = sys.argv[1]
-outfile = sys.argv[2]
 
-#clean_data = "data/cleaned_data.csv"
-#outfile = "results/debug_embeddings.csv"
+# supress warnings from BERT about finetuning
+logging.set_verbosity_error()
+
+# use the two lines below for use on Patas
+# clean_data = sys.argv[1]
+# outfile = sys.argv[2]
+
+# use the two lines below for debugging locally
+clean_data = "data/cleaned_data.csv"
+outfile = "results/debug_embeddings.csv"
 
 def getTokenEmbeddings(t1, model, t):
     """
@@ -28,21 +32,34 @@ def getTokenEmbeddings(t1, model, t):
     """
 
     # this is possibly bad coding, `t` and `model` were instantiated outside of this function
-    # in the first code block
     tokens = t(t1, return_attention_mask=False, return_token_type_ids=False)
+
+    # the tokenizer assigns an id to each of the original words
+    # for example, if t1 = "the lorax put up a fuss"
+    # then the word_ids = [None, 0, 1, 1, 1, 2, 3, 4, 5, None]
+    # where the 1 maps "lorax" to it's subwords
+    # the subparts can be explicitly seen using t.tokenize(t1)
+    # in this case: ['the', 'lo', '##ra', '##x', 'put', 'up', 'a', 'fuss']
+
     words_ids = tokens.word_ids()
-    if len(words_ids) > 512:
-        print("wait why did it tokenize it like this???")
 
     encoded_input = t(t1, return_tensors="pt")
-    output = model(**encoded_input)
+    output = model(**encoded_input) # returns a tensor of torch.Size([1, N, 768]) where N is the length of
+    # the tokenized array with subwords and CLS tokens. In the lorax example, N=10
 
     # Average subword representations
-    # Generate dummies for words_ids, multiply by the tensor
-    wi_d = pd.get_dummies(pd.Series(words_ids)).T
+    # Generate dummies for words_ids, multiply by the tensor with the last hidden state
+    wi_d = pd.get_dummies(pd.Series(words_ids)).T # this has the shape (# full tokens) x (# subword tokens)
+    # in the lorax example: 6 x 10
+    wi_d = wi_d / np.sum(wi_d, axis=1)[:, None] # each row should sum to 1 for an average
+
+    # matrix multiplication of wi_d and a matrix with dims [(# subword tokens) x 768]
     reduced_states = torch.matmul(
         torch.from_numpy(wi_d.values.astype("float32")), torch.squeeze(output["last_hidden_state"])
     )
+
+    # reduced states has dims [(# FULL tokens) x 768]
+
 
     words = t1.split()
     res = {words[i]: reduced_states[i] for i in range(len(words))}
@@ -53,10 +70,13 @@ def getTokenEmbeddings(t1, model, t):
     return res
 
 def process_embeddings(lst):
-    # Input: List of lists of words and embeddings
-    # Output: List of words + big numpy array of embeddings
+    """
+    INPUT: List of dicts of words and embeddings
+    OUTPUT: List of words + big numpy array of embeddings
+    """
 
     word_lst = [list(x.keys()) for x in lst]
+    #collapse list of lists into a 1-D list
     word_lst = [y for x in word_lst for y in x]
 
     # List of numpy arrays
@@ -64,33 +84,32 @@ def process_embeddings(lst):
 
     return word_lst, np_arr_list
 
+# read in cleaned data generated from preprocessing.py
 clean_file = open(clean_data)
 df = pd.read_csv(clean_file)
 clean_file.close()
 
+# sanity check
 print(df.shape)
+
+
 # omit sequences with more than 512 tokens according to
 # https://proceedings.neurips.cc/paper/2020/file/96671501524948bc3937b4b30d0e57b9-Paper.pdf
-
 df = df[df["noteTextList"].apply(lambda x: len(x) < 512)]
+
 # chunking
 # https://stackoverflow.com/questions/44729727/pandas-slice-large-dataframe-into-chunks
-
 n = 240  #chunk row size
 list_df = [df[i:i+n] for i in range(0,df.shape[0],n)]
-# def generateEmbeddings(small_df):
-#     strings = small_df.noteText.tolist() # don't make a list , just get the embeddings for each df row?
-#     embeddings = [getTokenEmbeddings(x) for x in strings]
-#     return embeddings
 
-#all_embeds = [] #2D list of chunk results
 words_list = []
 
 if 'np_embeds' in globals():
+    # TODO: what is up with np_embeds?
     del np_embeds
 
 for i in range(len(list_df)):
-# change me before moving to Patas for a full run!
+# or use smaller range below for local debugging
 #for i in range(2):
     print("chunk {0}/{1}".format
           (i, len(list_df)))
@@ -99,7 +118,7 @@ for i in range(len(list_df)):
     model = BertModel.from_pretrained("bert-base-uncased")
     t = BertTokenizerFast.from_pretrained("bert-base-uncased")
 
-    # define local version of get_token_embeddings
+    # Define local version of get_token_embeddings
     def getTokenEmbeddingsLoc(t1):
         return getTokenEmbeddings(t1, model, t)
 
@@ -127,7 +146,7 @@ for i in range(len(list_df)):
 print("The length of vocab is {}".format(len(words_list)))
 
 # Put results into a Pandas dataframe at the very end
-embed_varnames = ['emb_' + str(i) for i in range(768)]
+embed_varnames = ['dim_' + str(i) for i in range(768)]
 df_embeds = pd.DataFrame(np_embeds, columns=embed_varnames)
 df_embeds['word'] = words_list
 cols_order = ['word', *embed_varnames]
