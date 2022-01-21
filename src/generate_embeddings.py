@@ -16,19 +16,22 @@ logging.set_verbosity_error()
 # use the two lines below for use on Patas
 # clean_data = sys.argv[1]
 # outfile = sys.argv[2]
-# type = sys.argv[3]
+# input_type = sys.argv[3]
+#
+# input_type = str(input_type)
+
 
 # use the two lines below for debugging locally
-clean_data = "data/cleaned_data.csv"
+clean_data = "results/cleaned_data.csv"
 outfile = "results/debug_embeddings.csv"
-type = "notes"
+input_type = "tweets"
 
-if type == "notes":
-    typeList = "noteText"
-    typeText = "noteTextList"
-elif type == "tweets":
-    typeList = "tweetText"
-    typeText = "tweetTextList"
+if input_type == "notes":
+    typeList = "noteTextList"
+    typeText = "noteText"
+elif input_type == "tweets":
+    typeList = "tweetTextList"
+    typeText = "tweetText"
 else:
     raise Exception("Invalid type: please choose 'tweets' or 'notes'")
 
@@ -113,13 +116,8 @@ clean_file = open(clean_data)
 df = pd.read_csv(clean_file)
 clean_file.close()
 
-# sanity check
-print(df.shape)
 
 
-# omit sequences with more than 512 tokens according to
-# https://proceedings.neurips.cc/paper/2020/file/96671501524948bc3937b4b30d0e57b9-Paper.pdf
-df = df[df[typeList].apply(lambda x: len(x) < 512)]
 
 # chunking
 # https://stackoverflow.com/questions/44729727/pandas-slice-large-dataframe-into-chunks
@@ -129,7 +127,7 @@ list_df = [df[i : i + n] for i in range(0, df.shape[0], n)]
 words_list = []
 
 if "np_embeds" in globals():
-    # TODO: what is up with np_embeds?
+    # TODO: what is up with np_embeds? write a comment about it
     del np_embeds
 
 # for i in range(len(list_df)):

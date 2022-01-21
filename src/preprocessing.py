@@ -80,6 +80,11 @@ df["tweetTextList"] = df["tweetText"].str.lower().str.split()
 mask = ((df['noteTextList'].str.len() > 0) & (df['tweetTextList'].str.len() > 0))
 df = df.loc[mask]
 
+# omit sequences with more than 512 tokens according to
+# https://proceedings.neurips.cc/paper/2020/file/96671501524948bc3937b4b30d0e57b9-Paper.pdf
+df = df[df["noteTextList"].apply(lambda x: len(x) < 512)]
+df = df[df["tweetTextList"].apply(lambda x: len(x) < 512)]
+
 # writing cleaned data to a file
 cleaned_data = open("results/cleaned_data.csv", "w")
 df.to_csv(cleaned_data)
