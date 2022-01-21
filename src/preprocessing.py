@@ -11,7 +11,6 @@ import pandas as pd
 from nltk.tokenize import TweetTokenizer
 import re
 import sys
-import numpy as np
 
 # The raw files are passed in from the command line
 notes_filename = sys.argv[1]
@@ -77,13 +76,16 @@ df["noteTextList"] = df["noteText"].str.lower().str.split()
 df["tweetTextList"] = df["tweetText"].str.lower().str.split()
 
 # take out empty lists
-mask = ((df['noteTextList'].str.len() > 0) & (df['tweetTextList'].str.len() > 0))
+mask = (df["noteTextList"].str.len() > 0) & (df["tweetTextList"].str.len() > 0)
 df = df.loc[mask]
 
 # omit sequences with more than 512 tokens according to
 # https://proceedings.neurips.cc/paper/2020/file/96671501524948bc3937b4b30d0e57b9-Paper.pdf
-df = df[df["noteTextList"].apply(lambda x: len(x) < 512)]
-df = df[df["tweetTextList"].apply(lambda x: len(x) < 512)]
+# max token length seems to be around 512
+
+# df['noteLength'] = df['noteTextList'].apply(lambda x: len(x))
+# df['tweetLength'] = df['tweetTextList'].apply(lambda x: len(x))
+
 
 # writing cleaned data to a file
 cleaned_data = open("results/cleaned_data.csv", "w")

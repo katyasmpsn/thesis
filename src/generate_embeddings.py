@@ -24,13 +24,11 @@ logging.set_verbosity_error()
 # use the two lines below for debugging locally
 clean_data = "results/cleaned_data.csv"
 outfile = "results/debug_embeddings.csv"
-input_type = "tweets"
+input_type = "notes"
 
 if input_type == "notes":
-    typeList = "noteTextList"
     typeText = "noteText"
 elif input_type == "tweets":
-    typeList = "tweetTextList"
     typeText = "tweetText"
 else:
     raise Exception("Invalid type: please choose 'tweets' or 'notes'")
@@ -115,8 +113,6 @@ def process_embeddings(lst):
 clean_file = open(clean_data)
 df = pd.read_csv(clean_file)
 clean_file.close()
-
-
 
 
 # chunking
