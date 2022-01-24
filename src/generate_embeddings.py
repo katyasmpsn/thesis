@@ -14,17 +14,17 @@ import sys
 logging.set_verbosity_error()
 
 # use the two lines below for use on Patas
-# clean_data = sys.argv[1]
-# outfile = sys.argv[2]
-# input_type = sys.argv[3]
-#
-# input_type = str(input_type)
+clean_data = sys.argv[1]
+outfile = sys.argv[2]
+input_type = sys.argv[3]
+
+input_type = str(input_type)
 
 
 # use the two lines below for debugging locally
-clean_data = "results/cleaned_data.csv"
-outfile = "results/debug_embeddings.csv"
-input_type = "notes"
+# clean_data = "results/cleaned_data.csv"
+# outfile = "results/debug_embeddings.csv"
+# input_type = "notes"
 
 if input_type == "notes":
     typeText = "noteText"
@@ -126,9 +126,9 @@ if "np_embeds" in globals():
     # TODO: what is up with np_embeds? write a comment about it
     del np_embeds
 
-# for i in range(len(list_df)):
+for i in range(len(list_df)):
 # or use smaller range below for local debugging
-for i in range(2):
+# for i in range(2):
     print("chunk {0}/{1}".format(i, len(list_df)))
 
     # Instantiate chunk-level bert model
