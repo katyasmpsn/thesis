@@ -10,12 +10,17 @@ Data Pipeline (it's ~manual~):
 import pandas as pd
 from nltk.tokenize import TweetTokenizer
 import re
+import string
 import sys
 
 # The raw files are passed in from the command line
-notes_filename = sys.argv[1]
-hydrated_tweets_filename = sys.argv[2]
+# notes_filename = sys.argv[1]
+# hydrated_tweets_filename = sys.argv[2]
 # cleaned_data_filename = sys.argv[3] # output file should always be named the same?
+
+#local version
+notes_filename = "data/notes-00000.tsv"
+hydrated_tweets_filename = "data/hydrated_tweets.csv"
 
 notes = open(notes_filename, "r")
 hydrated_tweets = open(hydrated_tweets_filename, "r")
@@ -23,8 +28,18 @@ hydrated_tweets = open(hydrated_tweets_filename, "r")
 notes = pd.read_csv(notes, sep="\t")
 hydrated_tweets = pd.read_csv(hydrated_tweets)
 
+# the vast majority of birdwatch tweets seem to be in english, so to reduce the mapping
+# complexity; I'll look for only english language tweets too
+
+hydrated_tweets = hydrated_tweets[hydrated_tweets['lang'] == 'en']
+print(hydrated_tweets['lang'].value_counts())
+
 # merging and re-naming datasets
 df = pd.merge(notes, hydrated_tweets, how="left", left_on="tweetId", right_on="id")
+
+
+
+
 df = df[["noteId", "tweetId", "classification", "summary", "text", "tweet_url"]]
 df.columns = [
     "noteId",
@@ -34,6 +49,8 @@ df.columns = [
     "tweetText",
     "tweetURL",
 ]
+
+
 
 # omitting deleted tweets
 df = df[~df["tweetText"].isnull()]
@@ -65,6 +82,16 @@ def textCleaning(rawtext):
     # TODO: but now i'm wondering if stop words will fuck with the corpus stats. ask shane
     # tokens = [x for x in tokens if x not in stopwords.words('english')]
 
+    # taking out all punctuation
+    tokens = [s.translate(str.maketrans('', '', string.punctuation)) for s in tokens]
+
+    # taking out all non-ascii letters
+    printable = set(string.printable)
+    tokens = [''.join(filter(lambda x: x in printable, s)) for s in tokens]
+
+    #removing empty strings
+    tokens = [i for i in tokens if i]
+
     return " ".join(tokens)
 
 
@@ -88,6 +115,6 @@ df = df.loc[mask]
 
 
 # writing cleaned data to a file
-cleaned_data = open("results/cleaned_data.csv", "w")
+cleaned_data = open("results/cleaned_data_jan24.csv", "w")
 df.to_csv(cleaned_data)
 cleaned_data.close()

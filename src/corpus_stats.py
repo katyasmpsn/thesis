@@ -21,7 +21,7 @@ else:
 
 try:
     # TODO: update this to read in a filename that's passed in as an arg
-    df = pd.read_csv("results/cleaned_data.csv")
+    df = pd.read_csv("results/cleaned_data_jan24.csv")
     # when reading in the df, the list of words is evaluated as a string so we need literal eval to
     # make it into a list again
     df[col_name] = df[col_name].apply(literal_eval)

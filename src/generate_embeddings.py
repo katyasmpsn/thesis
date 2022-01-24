@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 We get the last hidden state from BERT for each word token, using the entire note/tweet/reply as the context window.
 Then the embeddings are averaged over each word type.
