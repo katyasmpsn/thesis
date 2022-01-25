@@ -7,8 +7,9 @@ import sys
 # input_type = sys.argv[1]
 # in_file = sys.argv[2]
 
-input_type = "tweets"
-in_file = "embeddings124/tweet_embeddings_jan24.csv"
+input_type = "notes"
+in_file = "embeddings124/note_embeddings_jan24.csv"
+cluster_file = "results/{}_centroids.csv".format(input_type)
 
 if input_type == "tweets":
     weight_file = "results/tweet_vocab_counts.csv"
@@ -63,10 +64,11 @@ clusters = kmeans.predict(X)
 
 X_dist = kmeans.transform(X)**2
 X['SqDist'] = X_dist.sum(axis=1).round(2)
-
 X["Cluster"] = clusters
 X["Word_Type"] = word_type
 X["Weights"] = weights
+
+X.to_csv("{}_embeddings_PCA.csv".format(input_type))
 
 # rerank top 100 with TF
 
@@ -82,11 +84,16 @@ top = top.sort_values(["Cluster", "SqDist"], ascending=True)
 grouped_df = top.groupby("Cluster")
 top = grouped_df.head(10).reset_index()
 
-# out_file = "results/clusters_{0}_{1}_{2}_{3}".format(input_type, dims, n_clusters, pd.Timestamp.today().strftime("%m_%d")
-#
-# )
-#
-# of = open(out_file, 'w')
-# X[["Cluster","Word_Type","Weights"]].to_csv(of)
-# of.close()
+out_file = "results/clusters_{0}_{1}_{2}_{3}".format(input_type, dims, n_clusters, pd.Timestamp.today().strftime("%m_%d")
 
+)
+
+of = open(out_file, 'w')
+top[["Cluster","Word_Type","Weights", "SqDist"]].to_csv(of)
+of.close()
+
+
+centroids = kmeans.cluster_centers_
+cl = open(cluster_file, "w")
+pd.DataFrame(centroids).to_csv(cl)
+cl.close()
