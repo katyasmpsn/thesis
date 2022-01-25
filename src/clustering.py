@@ -4,11 +4,11 @@ from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 import sys
 
-input_type = sys.argv[1]
-in_file = sys.argv[2]
+# input_type = sys.argv[1]
+# in_file = sys.argv[2]
 
-# input_type = "tweets"
-# in_file = "results/embeddings/tweet_embeddings_jan21.csv"
+input_type = "notes"
+in_file = "embeddings124/note_embeddings_jan24.csv"
 
 if input_type == "tweets":
     weight_file = "results/tweet_vocab_counts.csv"
@@ -35,7 +35,7 @@ This should be tested as a hyperparameter; but we can start by going from 768 ->
 
 dims = 100
 pca_100d = PCA(n_components=dims)
-X = pd.DataFrame(pca_100d.fit_transform(df.drop(columns=["word"]).reset_index()))
+X = pd.DataFrame(pca_100d.fit_transform(df.drop(columns=["word"])))
 
 """
 Step 2:
@@ -54,7 +54,7 @@ word_type = X["word_type"].to_list()
 weights = X["tf"].to_list()
 X = X.drop(columns = ["word_type", "tf"])
 
-n_clusters = 20
+n_clusters = 30
 kmeans = KMeans(n_clusters=n_clusters, random_state=0)
 kmeans.fit(X, sample_weight=weights)
 clusters = kmeans.predict(X)

@@ -16,17 +16,17 @@ import sys
 logging.set_verbosity_error()
 
 # use the two lines below for use on Patas
-clean_data = sys.argv[1]
-outfile = sys.argv[2]
-input_type = sys.argv[3]
+# clean_data = sys.argv[1]
+# outfile = sys.argv[2]
+# input_type = sys.argv[3]
 
-input_type = str(input_type)
+# input_type = str(input_type)
 
 
 # use the two lines below for debugging locally
-# clean_data = "results/cleaned_data.csv"
-# outfile = "results/debug_embeddings.csv"
-# input_type = "notes"
+clean_data = "results/cleaned_data_jan24.csv"
+outfile = "results/debug_embeddings.csv"
+input_type = "tweets"
 
 if input_type == "notes":
     typeText = "noteText"
@@ -128,9 +128,9 @@ if "np_embeds" in globals():
     # TODO: what is up with np_embeds? write a comment about it
     del np_embeds
 
-for i in range(len(list_df)):
+# for i in range(len(list_df)):
 # or use smaller range below for local debugging
-# for i in range(2):
+for i in range(1):
     print("chunk {0}/{1}".format(i, len(list_df)))
 
     # Instantiate chunk-level bert model
@@ -170,22 +170,23 @@ print("The length of vocab is {}".format(len(words_list)))
 embed_varnames = ["dim_" + str(i) for i in range(768)]
 df_embeds = pd.DataFrame(np_embeds, columns=embed_varnames)
 df_embeds["word"] = words_list
+
 cols_order = ["word", *embed_varnames]
 df_embeds = df_embeds[cols_order]
-
-# Generate a word count and a mean of the embeddings
-word_count = df_embeds.groupby(["word"])[embed_varnames[0]].count()
-word_count = word_count.sort_values(ascending=False)
+#
+# # Generate a word count and a mean of the embeddings
+# word_count = df_embeds.groupby(["word"])[embed_varnames[0]].count()
+# word_count = word_count.sort_values(ascending=False)
 df_embeds = df_embeds.groupby(["word"])[embed_varnames].mean()
-
-## Vocabulary list
-print("The length of the deduplicated vocab is {}".format(df_embeds.shape[0]))
-print("The 30 most frequently occurring words are:")
-print(word_count[0:30])
-
-# outfile = "../results/embeddings.csv"
-of = open(outfile, "w")
-df_embeds.to_csv(of)
-of.close()
-
-gc.collect()
+#
+# ## Vocabulary list
+# print("The length of the deduplicated vocab is {}".format(df_embeds.shape[0]))
+# print("The 30 most frequently occurring words are:")
+# print(word_count[0:30])
+#
+# # outfile = "../results/embeddings.csv"
+# of = open(outfile, "w")
+# df_embeds.to_csv(of)
+# of.close()
+#
+# gc.collect()

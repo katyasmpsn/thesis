@@ -1,6 +1,6 @@
 import pandas as pd
 
-df = pd.read_csv("embeddings_patas_jan18.csv")
+df = pd.read_csv("results/clusters_notes_100_20_01_24")
 
 def str_cat(x):
     """
@@ -9,7 +9,12 @@ def str_cat(x):
     return x.str.cat(sep=", ")
 
 
-examples = df.groupby("Cluster").agg({"Word_Type": str_cat, "Weights": "count"})
+examples = df.groupby("Cluster").agg({"Word_Type": list, "Weights": "count"})
+
+
+print(examples.iloc[1]['Word_Type'][:100])
+
+
 
 
 
