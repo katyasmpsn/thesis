@@ -7,8 +7,8 @@ import sys
 # input_type = sys.argv[1]
 # in_file = sys.argv[2]
 
-input_type = "notes"
-in_file = "embeddings124/note_embeddings_jan24.csv"
+input_type = "tweets"
+in_file = "embeddings124/tweet_embeddings_jan24.csv"
 
 if input_type == "tweets":
     weight_file = "results/tweet_vocab_counts.csv"
@@ -59,14 +59,34 @@ kmeans = KMeans(n_clusters=n_clusters, random_state=0)
 kmeans.fit(X, sample_weight=weights)
 clusters = kmeans.predict(X)
 
+# Centroids
+
+X_dist = kmeans.transform(X)**2
+X['SqDist'] = X_dist.sum(axis=1).round(2)
+
 X["Cluster"] = clusters
 X["Word_Type"] = word_type
 X["Weights"] = weights
 
-out_file = "results/clusters_{0}_{1}_{2}_{3}".format(input_type, dims, n_clusters, pd.Timestamp.today().strftime("%m_%d")
+# rerank top 100 with TF
 
-)
-of = open(out_file, 'w')
-X[["Cluster","Word_Type","Weights"]].to_csv(of)
-of.close()
+X = X.sort_values(["Cluster", "Weights"], ascending=False)
+
+grouped_df = X.groupby("Cluster")
+top = grouped_df.head(100).reset_index()
+
+# get top J according to min distance
+
+top = top.sort_values(["Cluster", "SqDist"], ascending=True)
+
+grouped_df = top.groupby("Cluster")
+top = grouped_df.head(10).reset_index()
+
+# out_file = "results/clusters_{0}_{1}_{2}_{3}".format(input_type, dims, n_clusters, pd.Timestamp.today().strftime("%m_%d")
+#
+# )
+#
+# of = open(out_file, 'w')
+# X[["Cluster","Word_Type","Weights"]].to_csv(of)
+# of.close()
 
