@@ -7,8 +7,8 @@ import sys
 # input_type = sys.argv[1]
 # in_file = sys.argv[2]
 
-input_type = "notes"
-in_file = "embeddings124/note_embeddings_jan24.csv"
+input_type = "tweets"
+in_file = "embeddings124/tweet_embeddings_jan24.csv"
 cluster_file = "results/{}_centroids.csv".format(input_type)
 
 if input_type == "tweets":
@@ -50,6 +50,8 @@ X["word_type"] = word_type_list
 weights = pd.read_csv(weight_file)
 weights.columns = ["word_type", "tf"]
 X = pd.merge(X, weights, how="left", on="word_type")
+# stop words arent in weights; will result in a nan
+X['tf'] = X['tf'].fillna(0)
 
 word_type = X["word_type"].to_list()
 weights = X["tf"].to_list()

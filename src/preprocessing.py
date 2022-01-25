@@ -11,6 +11,7 @@ import pandas as pd
 from nltk.tokenize import TweetTokenizer
 import re
 import string
+from nltk.corpus import stopwords
 import sys
 
 # The raw files are passed in from the command line
@@ -80,7 +81,7 @@ def textCleaning(rawtext):
     # TODO: check if Sia et al omitted stopwords here? On first read they did, but BERT would likely pick up on the
     # TODO: unnaturalness. Uncomment the line below if they should be omitted
     # TODO: but now i'm wondering if stop words will fuck with the corpus stats. ask shane
-    # tokens = [x for x in tokens if x not in stopwords.words('english')]
+    tokens = [x for x in tokens if x not in stopwords.words('english')]
 
     # taking out all punctuation
     tokens = [s.translate(str.maketrans('', '', string.punctuation)) for s in tokens]
@@ -95,12 +96,12 @@ def textCleaning(rawtext):
     return " ".join(tokens)
 
 
-df["noteText"] = df["noteText"].apply(textCleaning)
-df["tweetText"] = df["tweetText"].apply(textCleaning)
+df["noteText1"] = df["noteText"].apply(textCleaning)
+df["tweetText1"] = df["tweetText"].apply(textCleaning)
 
 # creating a column with a list of words for each text snippet so that it's easier to to calculate term frequencies over the corpus
-df["noteTextList"] = df["noteText"].str.lower().str.split()
-df["tweetTextList"] = df["tweetText"].str.lower().str.split()
+df["noteTextList"] = df["noteText1"].str.lower().str.split()
+df["tweetTextList"] = df["tweetText1"].str.lower().str.split()
 
 # take out empty lists
 mask = (df["noteTextList"].str.len() > 0) & (df["tweetTextList"].str.len() > 0)
