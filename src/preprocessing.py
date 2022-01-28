@@ -33,13 +33,9 @@ hydrated_tweets = pd.read_csv(hydrated_tweets)
 # complexity; I'll look for only english language tweets too
 
 hydrated_tweets = hydrated_tweets[hydrated_tweets['lang'] == 'en']
-print(hydrated_tweets['lang'].value_counts())
 
 # merging and re-naming datasets
 df = pd.merge(notes, hydrated_tweets, how="left", left_on="tweetId", right_on="id")
-
-
-
 
 df = df[["noteId", "tweetId", "classification", "summary", "text", "tweet_url"]]
 df.columns = [
@@ -64,7 +60,7 @@ tt = TweetTokenizer()
 def textCleaning(rawtext):
     """
     Input: Raw text from notes or hydrated tweet
-    Output: A list of lowercased tokens with usernames, hashtags, urls, stopwords, and digits omitted
+    Output: A string of lowercased tokens with usernames, hashtags, urls, stopwords, and digits omitted
     """
 
     tokens = tt.tokenize(rawtext)
@@ -78,10 +74,7 @@ def textCleaning(rawtext):
 
     tokens = [x for x in tokens if re.search(hashtag_pattern, x[0])]
     tokens = [x for x in tokens if not re.search(url_pattern, x)]
-    # TODO: check if Sia et al omitted stopwords here? On first read they did, but BERT would likely pick up on the
-    # TODO: unnaturalness. Uncomment the line below if they should be omitted
-    # TODO: but now i'm wondering if stop words will fuck with the corpus stats. ask shane
-    tokens = [x for x in tokens if x not in stopwords.words('english')]
+
 
     # taking out all punctuation
     tokens = [s.translate(str.maketrans('', '', string.punctuation)) for s in tokens]
@@ -95,13 +88,27 @@ def textCleaning(rawtext):
 
     return " ".join(tokens)
 
+# These columns contain strings that have been cleaned; and will be fed into BERT
+df["noteText"] = df["noteText"].apply(textCleaning)
+df["tweetText"] = df["tweetText"].apply(textCleaning)
 
-df["noteText1"] = df["noteText"].apply(textCleaning)
-df["tweetText1"] = df["tweetText"].apply(textCleaning)
 
 # creating a column with a list of words for each text snippet so that it's easier to to calculate term frequencies over the corpus
-df["noteTextList"] = df["noteText1"].str.lower().str.split()
-df["tweetTextList"] = df["tweetText1"].str.lower().str.split()
+df["noteTextList"] = df["noteText"].str.lower().str.split()
+df["tweetTextList"] = df["tweetText"].str.lower().str.split()
+
+# TODO: check if Sia et al omitted stopwords here? On first read they did, but BERT would likely pick up on the
+# TODO: unnaturalness. Uncomment the line below if they should be omitted
+# TODO: but now i'm wondering if stop words will fuck with the corpus stats. ask shane
+
+def remove_stopwords(tokens):
+    return [x for x in tokens if x not in stopwords.words('english')]
+
+# The columns below will be used to calculate term frequencies and will be used as the main "doc"
+# to map the embeddings back on to
+df["noteTextList"] = df["noteTextList"].apply(remove_stopwords)
+df["tweetTextList"] = df["tweetTextList"].apply(remove_stopwords)
+
 
 # take out empty lists
 mask = (df["noteTextList"].str.len() > 0) & (df["tweetTextList"].str.len() > 0)
@@ -116,6 +123,6 @@ df = df.loc[mask]
 
 
 # writing cleaned data to a file
-cleaned_data = open("results/cleaned_data_jan24.csv", "w")
+cleaned_data = open("results/cleaned_data.csv", "w")
 df.to_csv(cleaned_data)
 cleaned_data.close()

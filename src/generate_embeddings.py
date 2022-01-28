@@ -15,23 +15,48 @@ import sys
 # supress warnings from BERT about finetuning
 logging.set_verbosity_error()
 
-# use the two lines below for use on Patas
-# clean_data = sys.argv[1]
-# outfile = sys.argv[2]
-# input_type = sys.argv[3]
+# use the four lines below for use on Patas
+clean_data = sys.argv[1]
+outfile = sys.argv[2]
+input_type = sys.argv[3]
+input_type = str(input_type)
 
-# input_type = str(input_type)
 
-
-# use the two lines below for debugging locally
-clean_data = "results/cleaned_data_jan24.csv"
-outfile = "results/debug_embeddings.csv"
-input_type = "tweets"
+# use the three lines below for debugging locally
+# clean_data = "results/cleaned_data.csv"
+# outfile = "results/debug_embeddings.csv"
+# input_type = "both"
 
 if input_type == "notes":
     typeText = "noteText"
+    # read in cleaned data generated from preprocessing.py
+    clean_file = open(clean_data)
+    df = pd.read_csv(clean_file)
+    clean_file.close()
 elif input_type == "tweets":
     typeText = "tweetText"
+    # read in cleaned data generated from preprocessing.py
+    clean_file = open(clean_data)
+    df = pd.read_csv(clean_file)
+    clean_file.close()
+elif input_type == "both":
+    typeText = "bothText"
+    # concating notes and tweets together to run corpus stats over both
+    # read in cleaned data generated from preprocessing.py
+    clean_file = open(clean_data)
+    df = pd.read_csv(clean_file)
+    dfn = df[["noteText"]]
+    dft = df[["tweetText"]]
+    df = pd.concat(
+        [
+            dfn.rename(columns={"noteText": typeText}),
+            dft.rename(columns={"tweetText": typeText}),
+        ],
+        axis=0,
+        ignore_index=True,
+    )
+    clean_file.close()
+
 else:
     raise Exception("Invalid type: please choose 'tweets' or 'notes'")
 
@@ -111,12 +136,6 @@ def process_embeddings(lst):
     return word_lst, np_arr_list
 
 
-# read in cleaned data generated from preprocessing.py
-clean_file = open(clean_data)
-df = pd.read_csv(clean_file)
-clean_file.close()
-
-
 # chunking
 # https://stackoverflow.com/questions/44729727/pandas-slice-large-dataframe-into-chunks
 n = 240  # chunk row size
@@ -128,9 +147,9 @@ if "np_embeds" in globals():
     # TODO: what is up with np_embeds? write a comment about it
     del np_embeds
 
-# for i in range(len(list_df)):
+for i in range(len(list_df)):
 # or use smaller range below for local debugging
-for i in range(1):
+# for i in range(2):
     print("chunk {0}/{1}".format(i, len(list_df)))
 
     # Instantiate chunk-level bert model
@@ -173,20 +192,20 @@ df_embeds["word"] = words_list
 
 cols_order = ["word", *embed_varnames]
 df_embeds = df_embeds[cols_order]
-#
-# # Generate a word count and a mean of the embeddings
-# word_count = df_embeds.groupby(["word"])[embed_varnames[0]].count()
-# word_count = word_count.sort_values(ascending=False)
+
+# Generate a word count and a mean of the embeddings
+word_count = df_embeds.groupby(["word"])[embed_varnames[0]].count()
+word_count = word_count.sort_values(ascending=False)
 df_embeds = df_embeds.groupby(["word"])[embed_varnames].mean()
-#
-# ## Vocabulary list
-# print("The length of the deduplicated vocab is {}".format(df_embeds.shape[0]))
-# print("The 30 most frequently occurring words are:")
-# print(word_count[0:30])
-#
-# # outfile = "../results/embeddings.csv"
-# of = open(outfile, "w")
-# df_embeds.to_csv(of)
-# of.close()
-#
-# gc.collect()
+
+## Vocabulary list
+print("The length of the deduplicated vocab is {}".format(df_embeds.shape[0]))
+print("The 30 most frequently occurring words are:")
+print(word_count[0:30])
+
+# outfile = "../results/embeddings.csv"
+of = open(outfile, "w")
+df_embeds.to_csv(of)
+of.close()
+
+gc.collect()

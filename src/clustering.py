@@ -7,20 +7,37 @@ import sys
 # input_type = sys.argv[1]
 # in_file = sys.argv[2]
 
-input_type = "tweets"
-in_file = "embeddings124/tweet_embeddings_jan24.csv"
+input_type = "both"
+in_file = "both_embeddings_jan27.csv"
 cluster_file = "results/{}_centroids.csv".format(input_type)
-
-if input_type == "tweets":
-    weight_file = "results/tweet_vocab_counts.csv"
-elif input_type == "notes":
-    weight_file = "results/note_vocab_counts.csv"
-else:
-    print("Incorrect argument! Please use `tweets` or `notes`")
+#
+# if input_type == "tweets":
+#     weight_file = "results/tweet_vocab_counts.csv"
+# elif input_type == "notes":
+#     weight_file = "results/note_vocab_counts.csv"
+# else:
+#     print("Incorrect argument! Please use `tweets` or `notes`")
 
 # reading in embeddings
 # df = pd.read_csv("results/embeddings/note_embeddings_jan21.csv", index_col=False)
+# df0 = pd.read_csv(in_file, index_col=False)
+# weights0 = pd.read_csv("results/tweet_vocab_counts.csv")
+# weights0.columns = ["word", "tf"]
+# df0 = pd.merge(df0, weights0, how="left", on="word")
+# # stop words arent in weights; will result in a nan
+# df0['tf'] = df0['tf'].fillna(0)
+
+
 df = pd.read_csv(in_file, index_col=False)
+weights1 = pd.read_csv("results/both_vocab_counts.csv")
+weights1.columns = ["word", "tf"]
+df = pd.merge(df, weights1, how="left", on="word")
+# # stop words arent in weights; will result in a nan
+df = df.dropna(subset = ["tf"])
+#df['tf'] = df['tf'].fillna(0)
+
+
+# df = pd.concat([df0, df1])
 # not sure why this column exists
 # df = df.drop(columns=["Unnamed: 0"])
 
@@ -36,7 +53,9 @@ This should be tested as a hyperparameter; but we can start by going from 768 ->
 
 dims = 100
 pca_100d = PCA(n_components=dims)
-X = pd.DataFrame(pca_100d.fit_transform(df.drop(columns=["word"])))
+word_type_list = df["word"].tolist()
+weights = df['tf'].tolist()
+X = pd.DataFrame(pca_100d.fit_transform(df.drop(columns=["word", "tf", "word"])))
 
 """
 Step 2:
@@ -46,16 +65,20 @@ Setting N = 20 for some initial testing
 
 # based on https://www.kaggle.com/minc33/visualizing-high-dimensional-clusters
 
-X["word_type"] = word_type_list
-weights = pd.read_csv(weight_file)
-weights.columns = ["word_type", "tf"]
-X = pd.merge(X, weights, how="left", on="word_type")
-# stop words arent in weights; will result in a nan
-X['tf'] = X['tf'].fillna(0)
+# X["word_type"] = word_type_list
 
-word_type = X["word_type"].to_list()
-weights = X["tf"].to_list()
-X = X.drop(columns = ["word_type", "tf"])
+# weights1 = pd.read_csv("results/tweet_tweet_counts.csv")
+#
+#
+#
+# weights.columns = ["word_type", "tf"]
+# X = pd.merge(X, weights, how="left", on="word_type")
+# # stop words arent in weights; will result in a nan
+# X['tf'] = X['tf'].fillna(0)
+
+# word_type = X["word_type"].to_list()
+# weights = X["tf"].to_list()
+# X = X.drop(columns = ["word_type", "tf"])
 
 n_clusters = 30
 kmeans = KMeans(n_clusters=n_clusters, random_state=0)
@@ -67,7 +90,7 @@ clusters = kmeans.predict(X)
 X_dist = kmeans.transform(X)**2
 X['SqDist'] = X_dist.sum(axis=1).round(2)
 X["Cluster"] = clusters
-X["Word_Type"] = word_type
+X["Word_Type"] = word_type_list
 X["Weights"] = weights
 
 X.to_csv("{}_embeddings_PCA.csv".format(input_type))
