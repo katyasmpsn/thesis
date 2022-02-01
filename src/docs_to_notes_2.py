@@ -20,7 +20,6 @@ tweet_df = docs[["tweetTextList", "noteId", "tweetId"]]
 
 
 
-
 def return_distribution(row, col, centroids):
 
     # example_line = row
@@ -48,3 +47,10 @@ def return_distribution(row, col, centroids):
 
 note_df['probs'] = note_df.apply(lambda x: return_distribution(x, 'noteTextList', centroids), axis=1)
 tweet_df['probs'] = tweet_df.apply(lambda x: return_distribution(x, 'tweetTextList', centroids), axis=1)
+
+# note_df['doc'] = "notes"
+# tweet_df['doc'] = "tweets"
+
+final = pd.merge(note_df, tweet_df, on=['noteId', 'tweetId'], indicator=True, suffixes=("_note", "_tweet"))
+
+final.to_csv("distribution.csv")

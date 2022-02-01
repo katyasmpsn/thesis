@@ -8,8 +8,8 @@ from collections import Counter
 from ast import literal_eval
 import sys
 
-# input_type = sys.argv[1]
-input_type = "both"
+input_type = sys.argv[1]
+# input_type = "both"
 
 if input_type == "tweets":
     df = pd.read_csv("results/cleaned_data.csv")
@@ -42,6 +42,7 @@ try:
     vocab_counts = Counter()
     df[col_name].apply(vocab_counts.update)
     corpus_denominator = sum(vocab_counts.values())
+    print(corpus_denominator)
     # tf weights
     vocab_counts = {
         key: value / corpus_denominator for (key, value) in vocab_counts.items()
