@@ -2,46 +2,23 @@ import pandas as pd
 import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
-import sys
-
-# input_type = sys.argv[1]
-# in_file = sys.argv[2]
-
-input_type = "both"
-in_file = "both_embeddings_jan27.csv"
-cluster_file = "results/{}_centroids.csv".format(input_type)
-#
-# if input_type == "tweets":
-#     weight_file = "results/tweet_vocab_counts.csv"
-# elif input_type == "notes":
-#     weight_file = "results/note_vocab_counts.csv"
-# else:
-#     print("Incorrect argument! Please use `tweets` or `notes`")
-
-# reading in embeddings
-# df = pd.read_csv("results/embeddings/note_embeddings_jan21.csv", index_col=False)
-# df0 = pd.read_csv(in_file, index_col=False)
-# weights0 = pd.read_csv("results/tweet_vocab_counts.csv")
-# weights0.columns = ["word", "tf"]
-# df0 = pd.merge(df0, weights0, how="left", on="word")
-# # stop words arent in weights; will result in a nan
-# df0['tf'] = df0['tf'].fillna(0)
+import logging
 
 
-df = pd.read_csv(in_file, index_col=False)
-weights1 = pd.read_csv("results/both_vocab_counts.csv")
-weights1.columns = ["word", "tf"]
-df = pd.merge(df, weights1, how="left", on="word")
-# # stop words arent in weights; will result in a nan
-df = df.dropna(subset = ["tf"])
-#df['tf'] = df['tf'].fillna(0)
+def getData():
+    """
 
+    :return: a dataframe with word types from the embeddings and their associated weights
+    """
+    in_file = "results/embeddings.csv"
 
-# df = pd.concat([df0, df1])
-# not sure why this column exists
-# df = df.drop(columns=["Unnamed: 0"])
-
-word_type_list = df.word.tolist()
+    df = pd.read_csv(in_file, index_col=False)
+    weights1 = pd.read_csv("results/tf_counts.csv")
+    weights1.columns = ["word", "tf"]
+    df = pd.merge(df, weights1, how="left", on="word")
+    # # stop words arent in weights; will result in a nan
+    df = df.dropna(subset = ["tf"])
+    return df
 
 """
 Step 1:
@@ -51,11 +28,22 @@ Not sure if the same logic applies for this exercise.
 This should be tested as a hyperparameter; but we can start by going from 768 -> 100
 """
 
-dims = 100
-pca_100d = PCA(n_components=dims)
-word_type_list = df["word"].tolist()
-weights = df['tf'].tolist()
-X = pd.DataFrame(pca_100d.fit_transform(df.drop(columns=["word", "tf", "word"])))
+# TODO: WRITE OPTION FOR NO PCA
+
+def PCACalc(df, dims):
+    if dims != 768:
+        logging.info("Using PCA to reduce to {} dimensions".format(dims))
+        pca_100d = PCA(n_components=dims)
+        word_type_list = df["word"].tolist()
+        weights = df['tf'].tolist()
+        X = pd.DataFrame(pca_100d.fit_transform(df.drop(columns=["word", "tf", "word"])))
+    else:
+        logging.info("Not using PCA! Using all {} dimensions from BERT".format(dims))
+        word_type_list = df["word"].tolist()
+        weights = df['tf'].tolist()
+        X = df.drop(columns=["word", "tf"])
+    return X, word_type_list, weights
+
 
 """
 Step 2:
@@ -63,62 +51,44 @@ KMeans with N topics (centroids). Again, topics might be used a hyperparameter
 Setting N = 20 for some initial testing
 """
 
-# based on https://www.kaggle.com/minc33/visualizing-high-dimensional-clusters
+def KMeansCalc(X, word_type_list, weights, n_clusters, seed, i, dim):
+    kmeans = KMeans(n_clusters=n_clusters, random_state=seed)
+    kmeans.fit(X, sample_weight=weights)
+    clusters = kmeans.predict(X)
 
-# X["word_type"] = word_type_list
+    # Centroids
 
-# weights1 = pd.read_csv("results/tweet_tweet_counts.csv")
-#
-#
-#
-# weights.columns = ["word_type", "tf"]
-# X = pd.merge(X, weights, how="left", on="word_type")
-# # stop words arent in weights; will result in a nan
-# X['tf'] = X['tf'].fillna(0)
+    # squared distance to cluster center
+    X_dist = kmeans.transform(X)**2
+    X['SqDist'] = X_dist.sum(axis=1).round(2)
+    X["Cluster"] = clusters
+    X["Word_Type"] = word_type_list
+    X["Weights"] = weights
 
-# word_type = X["word_type"].to_list()
-# weights = X["tf"].to_list()
-# X = X.drop(columns = ["word_type", "tf"])
+    # X.to_csv("results/test/beforererankandtop_{0}clusters_{1}dims_{2}seed.csv".format(n_clusters, dim, i))
 
-n_clusters = 30
-kmeans = KMeans(n_clusters=n_clusters, random_state=0)
-kmeans.fit(X, sample_weight=weights)
-clusters = kmeans.predict(X)
+    # rerank top 100 with TF
 
-# Centroids
+    X = X.sort_values(["Cluster", "Weights"], ascending=False)
 
-X_dist = kmeans.transform(X)**2
-X['SqDist'] = X_dist.sum(axis=1).round(2)
-X["Cluster"] = clusters
-X["Word_Type"] = word_type_list
-X["Weights"] = weights
+    grouped_df = X.groupby("Cluster")
+    top = grouped_df.head(100).reset_index()
 
-X.to_csv("{}_embeddings_PCA.csv".format(input_type))
+    # get top J according to min distance
 
-# rerank top 100 with TF
+    top = top.sort_values(["Cluster", "SqDist"], ascending=True)
 
-X = X.sort_values(["Cluster", "Weights"], ascending=False)
+    grouped_df = top.groupby("Cluster")
+    top = grouped_df.head(10).reset_index()
 
-grouped_df = X.groupby("Cluster")
-top = grouped_df.head(100).reset_index()
+    out_file = "results/test/clusters_{0}clusters_{1}dims_{2}seed".format(n_clusters, dim, i)
 
-# get top J according to min distance
+    of = open(out_file, 'w')
+    top[["Cluster","Word_Type","Weights", "SqDist"]].to_csv(of)
+    of.close()
 
-top = top.sort_values(["Cluster", "SqDist"], ascending=True)
-
-grouped_df = top.groupby("Cluster")
-top = grouped_df.head(10).reset_index()
-
-out_file = "results/clusters_{0}_{1}_{2}_{3}".format(input_type, dims, n_clusters, pd.Timestamp.today().strftime("%m_%d")
-
-)
-
-of = open(out_file, 'w')
-top[["Cluster","Word_Type","Weights", "SqDist"]].to_csv(of)
-of.close()
-
-
-centroids = kmeans.cluster_centers_
-cl = open(cluster_file, "w")
-pd.DataFrame(centroids).to_csv(cl)
-cl.close()
+    cluster_file = "results/test/centroids_{0}clusters_{1}dims_{2}seed.csv".format(n_clusters, dim, i)
+    centroids = kmeans.cluster_centers_
+    cl = open(cluster_file, "w")
+    pd.DataFrame(centroids).to_csv(cl)
+    cl.close()
