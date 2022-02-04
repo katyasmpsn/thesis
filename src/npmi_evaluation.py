@@ -145,8 +145,7 @@ def avgClusterNPMI(cluster_words, stats, total_ct):
     """
     Input: 1D List of words in a cluster
     Output: Average NPMI for the cluster
-    wtf is happening? It is averaged twice: NPMI is calculated for each w1, w2; so an average of all the pairs is taken
-    And, an average of all of the words is taken in the cluster.
+     NPMI is calculated for each w1, w2; so an average of all the pairs in tihe cluster is taken
     It looks like Lau et al sums the NPMIs but that would result in NPMIs that aren't really interpretable (not
     within the [-1,1] range)
     """
@@ -185,10 +184,49 @@ def avgClusterNPMI(cluster_words, stats, total_ct):
     return res, npmi_scores
 
 
+def runNPMI(cluster_df, npmi_frequencies, total_ct):
+    """
+
+    :param cluster_df: dataframe with many clusters for several hyperparameters
+    :param npmi_frequencies: the matrix of w1/w2 counts
+    :return: averaged NPMI scores for each hyperparameter variation
+    """
+    df = cluster_df.groupby(['numCluster', 'dimensions', 'seed'])
+    run_data = []
+    omitted_clusters = []
+    for key, item in df:
+        print(key)
+        # iterating through each dataframe of results for each set of hyperparamaters
+        cluster_ids = item.Cluster.unique().tolist()
+        cluster_scores = 0
+        for cluster_id in cluster_ids:
+            #         print(cluster_id)
+            temp_df = item[item['Cluster'] == cluster_id]
+            word_list = temp_df.Word_Type.tolist()
+            if len(word_list) != 1:
+                score, word = avgClusterNPMI(word_list, npmi_frequencies, total_ct)
+                cluster_scores += score
+            else:
+                omitted_clusters.append((key, cluster_id))
+                # some clusters might only have one word. They're omitted from the analysis
+                continue
+        run_score = cluster_scores / len(cluster_ids)
+        run_data.append([key[0], key[1], key[2], run_score])
+    return run_data, omitted_clusters
+
+def avgRandomSeeds(output_scores):
+    results = pd.DataFrame(output_scores, columns=['NClusters', 'NDims', 'RandomSeed', "Score"])
+    results = pd.DataFrame(results.groupby(['NClusters', 'NDims'])['Score'].mean()).reset_index()
+    results.to_csv("results/npmi_eval.csv")
+    return results
+
 nested_cluster_words, flattened_cluster_words, cluster_df, test_df = readData()
 window = defineWindow(test_df)
 cluster_df = omitMissingWords(cluster_df, flattened_cluster_words)
 wordword_freq, total_ct = mainPMIStats(nested_cluster_words, window)
-npmi_score, word_scores = avgClusterNPMI(
-    ["biden", "putin", "russia", "usa"], wordword_freq, total_ct
-)
+# npmi_score, word_scores = avgClusterNPMI(
+#     ["biden", "putin", "russia", "usa"], wordword_freq, total_ct
+# )
+scores, onewordclusters = runNPMI(cluster_df, wordword_freq, total_ct)
+logging.info("omitted {} one word clusters from the analysis".format(len(onewordclusters)))
+results = avgRandomSeeds(scores)
