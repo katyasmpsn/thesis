@@ -28,8 +28,6 @@ Not sure if the same logic applies for this exercise.
 This should be tested as a hyperparameter; but we can start by going from 768 -> 100
 """
 
-# TODO: WRITE OPTION FOR NO PCA
-
 def PCACalc(df, dims):
     if dims != 768:
         logging.info("Using PCA to reduce to {} dimensions".format(dims))
@@ -51,7 +49,7 @@ KMeans with N topics (centroids). Again, topics might be used a hyperparameter
 Setting N = 20 for some initial testing
 """
 
-def KMeansCalc(X, word_type_list, weights, n_clusters, seed, i, dim):
+def KMeansCalc(X, word_type_list, weights, n_clusters, seed, i, dim, write=False):
     kmeans = KMeans(n_clusters=n_clusters, random_state=seed)
     kmeans.fit(X, sample_weight=weights)
     clusters = kmeans.predict(X)
@@ -65,7 +63,8 @@ def KMeansCalc(X, word_type_list, weights, n_clusters, seed, i, dim):
     X["Word_Type"] = word_type_list
     X["Weights"] = weights
 
-    # X.to_csv("results/test/beforererankandtop_{0}clusters_{1}dims_{2}seed.csv".format(n_clusters, dim, i))
+    if write:
+        X.to_csv("results/test/beforererankandtop_{0}clusters_{1}dims_{2}seed.csv".format(n_clusters, dim, i))
 
     # rerank top 100 with TF
 
@@ -83,12 +82,17 @@ def KMeansCalc(X, word_type_list, weights, n_clusters, seed, i, dim):
 
     out_file = "results/test/clusters_{0}clusters_{1}dims_{2}seed".format(n_clusters, dim, i)
 
-    of = open(out_file, 'w')
-    top[["Cluster","Word_Type","Weights", "SqDist"]].to_csv(of)
-    of.close()
+    if write:
+        of = open(out_file, 'w')
+        top[["Cluster","Word_Type","Weights", "SqDist"]].to_csv(of)
+        of.close()
 
     cluster_file = "results/test/centroids_{0}clusters_{1}dims_{2}seed.csv".format(n_clusters, dim, i)
     centroids = kmeans.cluster_centers_
-    cl = open(cluster_file, "w")
-    pd.DataFrame(centroids).to_csv(cl)
-    cl.close()
+
+    if write:
+        cl = open(cluster_file, "w")
+        pd.DataFrame(centroids).to_csv(cl)
+        cl.close()
+
+    return top[["Cluster","Word_Type","Weights", "SqDist"]]

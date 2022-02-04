@@ -3,7 +3,6 @@ Data Pipeline (it's ~manual~):
     * download notes and ratings data from https://twitter.github.io/birdwatch/contributing/download-data/
     * create a list of all unique tweet ids from the notes data, and save it to a .txt file
     * hydrate the tweets using DocNow hydrator (https://twitter.github.io/birdwatch/contributing/download-data/)
-    * join the hydrated tweet information to the notes data
     * run this script!
 """
 
