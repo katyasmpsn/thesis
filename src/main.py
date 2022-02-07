@@ -43,7 +43,7 @@ logging.info("🎉 Successfully created dataset from train data with Term-Freque
 generate_embeddings.mainGeneration(df_tf, col_wordText)
 logging.info("🎉 Successfully generated embeddings!")
 
-# TRAIN: clustering the embeddings
+TRAIN: clustering the embeddings
 
 num_clusters = [20, 50, 100]
 dims_for_PCS = [100, 300, 500, 768]
@@ -56,14 +56,15 @@ for d in dims_for_PCS:
     for n in num_clusters:
         for i, seed in enumerate(random_seeds):
             reduced_matrix, word_list, weight_list = clustering.PCACalc(wordsweights, d)
-            temp = clustering.KMeansCalc(reduced_matrix, word_list, weight_list, n, seed, i, d)
+            temp, sil_score = clustering.KMeansCalc(reduced_matrix, word_list, weight_list, n, seed, i, d)
             logging.info("K MEANS with {0} Clusters, {1} dims, random seed = {2} ({3}".format(
                 n, d, seed, i
             ))
             temp['numCluster'] = n
             temp['dimensions'] = d
             temp['seed'] = seed
+            temp['silhouette_score'] = sil_score
             temp_dfs.append(temp)
 
 final = pd.concat(temp_dfs, axis=0, ignore_index=True)
-final.to_csv("results/all_runs.csv")
+final.to_csv("results/all_runs_temp.csv")

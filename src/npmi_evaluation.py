@@ -210,6 +210,7 @@ def runNPMI(cluster_df, npmi_frequencies, total_ct):
                 omitted_clusters.append((key, cluster_id))
                 # some clusters might only have one word. They're omitted from the analysis
                 continue
+
         run_score = cluster_scores / len(cluster_ids)
         run_data.append([key[0], key[1], key[2], run_score])
     return run_data, omitted_clusters

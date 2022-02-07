@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
+from sklearn.metrics import silhouette_samples, silhouette_score
 import logging
 
 
@@ -54,6 +55,7 @@ def KMeansCalc(X, word_type_list, weights, n_clusters, seed, i, dim, write=False
     kmeans.fit(X, sample_weight=weights)
     clusters = kmeans.predict(X)
 
+
     # Centroids
 
     # squared distance to cluster center
@@ -80,6 +82,12 @@ def KMeansCalc(X, word_type_list, weights, n_clusters, seed, i, dim, write=False
     grouped_df = top.groupby("Cluster")
     top = grouped_df.head(10).reset_index()
 
+    # for silhouette analysis
+    X_t = top.drop(columns=['SqDist','Cluster','Word_Type',"Weights", "level_0", "index"])
+    cluster_labels = top["Cluster"].to_numpy()
+    silhouette_avg = silhouette_score(X_t, cluster_labels)
+
+
     out_file = "results/test/clusters_{0}clusters_{1}dims_{2}seed".format(n_clusters, dim, i)
 
     if write:
@@ -95,4 +103,4 @@ def KMeansCalc(X, word_type_list, weights, n_clusters, seed, i, dim, write=False
         pd.DataFrame(centroids).to_csv(cl)
         cl.close()
 
-    return top[["Cluster","Word_Type","Weights", "SqDist"]]
+    return top[["Cluster","Word_Type","Weights", "SqDist"]], silhouette_avg
