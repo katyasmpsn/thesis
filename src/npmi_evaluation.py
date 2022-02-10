@@ -216,10 +216,23 @@ def runNPMI(cluster_df, npmi_frequencies, total_ct):
     return run_data, omitted_clusters
 
 def avgRandomSeeds(output_scores):
-    results = pd.DataFrame(output_scores, columns=['NClusters', 'NDims', 'RandomSeed', "Score"])
-    results = pd.DataFrame(results.groupby(['NClusters', 'NDims'])['Score'].mean()).reset_index()
-    results.to_csv("results/npmi_eval.csv")
+    results = pd.DataFrame(output_scores, columns=['NClusters', 'NDims', 'RandomSeed', "NPMI_Score"])
+    results = pd.DataFrame(results.groupby(['NClusters', 'NDims'])['NPMI_Score'].mean()).reset_index()
+
     return results
+
+def appendOtherMetrics(npmi_results, clusters):
+    temp = clusters.groupby(['numCluster', 'dimensions', 'seed']).agg({"silhouette_score":"first",
+                                                               "SqDist": "mean"}).reset_index()
+    temp = temp.groupby(['numCluster', 'dimensions']).agg({"silhouette_score":"mean",
+                                                               "SqDist": "mean"}).reset_index()
+    temp.columns = ['NClusters', 'NDims', 'Silhouette_Index', 'Mean_Cluster_L22']
+
+    results = pd.merge(npmi_results, temp)
+
+    results.to_csv("results/npmi_eval.csv")
+    return temp
+
 
 nested_cluster_words, flattened_cluster_words, cluster_df, test_df = readData()
 window = defineWindow(test_df)
@@ -231,3 +244,4 @@ wordword_freq, total_ct = mainPMIStats(nested_cluster_words, window)
 scores, onewordclusters = runNPMI(cluster_df, wordword_freq, total_ct)
 logging.info("omitted {} one word clusters from the analysis".format(len(onewordclusters)))
 results = avgRandomSeeds(scores)
+othermetrics = appendOtherMetrics(results, cluster_df)

@@ -76,3 +76,75 @@ INFO:root:Using PCA to reduce to 100 dimensions
 INFO:root:Using PCA to reduce to 100 dimensions
 INFO:root:Using PCA to reduce to 100 dimensions
 INFO:root:K MEANS with 20 Clusters, 100 dims, random seed = 909 (0
+INFO:root:Using PCA to reduce to 100 dimensions
+INFO:root:K MEANS with 20 Clusters, 100 dims, random seed = 372 (0
+INFO:root:Using PCA to reduce to 100 dimensions
+INFO:root:K MEANS with 20 Clusters, 100 dims, random seed = 936 (1
+INFO:root:Using PCA to reduce to 100 dimensions
+INFO:root:K MEANS with 20 Clusters, 100 dims, random seed = 450 (2
+INFO:root:Using PCA to reduce to 100 dimensions
+INFO:root:K MEANS with 50 Clusters, 100 dims, random seed = 372 (0
+INFO:root:Using PCA to reduce to 100 dimensions
+INFO:root:K MEANS with 50 Clusters, 100 dims, random seed = 936 (1
+INFO:root:Using PCA to reduce to 100 dimensions
+INFO:root:K MEANS with 50 Clusters, 100 dims, random seed = 450 (2
+INFO:root:Using PCA to reduce to 100 dimensions
+INFO:root:K MEANS with 100 Clusters, 100 dims, random seed = 372 (0
+INFO:root:Using PCA to reduce to 100 dimensions
+INFO:root:K MEANS with 100 Clusters, 100 dims, random seed = 936 (1
+INFO:root:Using PCA to reduce to 100 dimensions
+INFO:root:K MEANS with 100 Clusters, 100 dims, random seed = 450 (2
+INFO:root:Using PCA to reduce to 300 dimensions
+INFO:root:K MEANS with 20 Clusters, 300 dims, random seed = 372 (0
+INFO:root:Using PCA to reduce to 300 dimensions
+INFO:root:K MEANS with 20 Clusters, 300 dims, random seed = 936 (1
+INFO:root:Using PCA to reduce to 300 dimensions
+INFO:root:K MEANS with 20 Clusters, 300 dims, random seed = 450 (2
+INFO:root:Using PCA to reduce to 300 dimensions
+INFO:root:K MEANS with 50 Clusters, 300 dims, random seed = 372 (0
+INFO:root:Using PCA to reduce to 300 dimensions
+INFO:root:K MEANS with 50 Clusters, 300 dims, random seed = 936 (1
+INFO:root:Using PCA to reduce to 300 dimensions
+INFO:root:K MEANS with 50 Clusters, 300 dims, random seed = 450 (2
+INFO:root:Using PCA to reduce to 300 dimensions
+INFO:root:K MEANS with 100 Clusters, 300 dims, random seed = 372 (0
+INFO:root:Using PCA to reduce to 300 dimensions
+INFO:root:K MEANS with 100 Clusters, 300 dims, random seed = 936 (1
+INFO:root:Using PCA to reduce to 300 dimensions
+INFO:root:K MEANS with 100 Clusters, 300 dims, random seed = 450 (2
+INFO:root:Using PCA to reduce to 500 dimensions
+INFO:root:K MEANS with 20 Clusters, 500 dims, random seed = 372 (0
+INFO:root:Using PCA to reduce to 500 dimensions
+INFO:root:K MEANS with 20 Clusters, 500 dims, random seed = 936 (1
+INFO:root:Using PCA to reduce to 500 dimensions
+INFO:root:K MEANS with 20 Clusters, 500 dims, random seed = 450 (2
+INFO:root:Using PCA to reduce to 500 dimensions
+INFO:root:K MEANS with 50 Clusters, 500 dims, random seed = 372 (0
+INFO:root:Using PCA to reduce to 500 dimensions
+INFO:root:K MEANS with 50 Clusters, 500 dims, random seed = 936 (1
+INFO:root:Using PCA to reduce to 500 dimensions
+INFO:root:K MEANS with 50 Clusters, 500 dims, random seed = 450 (2
+INFO:root:Using PCA to reduce to 500 dimensions
+INFO:root:K MEANS with 100 Clusters, 500 dims, random seed = 372 (0
+INFO:root:Using PCA to reduce to 500 dimensions
+INFO:root:K MEANS with 100 Clusters, 500 dims, random seed = 936 (1
+INFO:root:Using PCA to reduce to 500 dimensions
+INFO:root:K MEANS with 100 Clusters, 500 dims, random seed = 450 (2
+INFO:root:Not using PCA! Using all 768 dimensions from BERT
+INFO:root:K MEANS with 20 Clusters, 768 dims, random seed = 372 (0
+INFO:root:Not using PCA! Using all 768 dimensions from BERT
+INFO:root:K MEANS with 20 Clusters, 768 dims, random seed = 936 (1
+INFO:root:Not using PCA! Using all 768 dimensions from BERT
+INFO:root:K MEANS with 20 Clusters, 768 dims, random seed = 450 (2
+INFO:root:Not using PCA! Using all 768 dimensions from BERT
+INFO:root:K MEANS with 50 Clusters, 768 dims, random seed = 372 (0
+INFO:root:Not using PCA! Using all 768 dimensions from BERT
+INFO:root:K MEANS with 50 Clusters, 768 dims, random seed = 936 (1
+INFO:root:Not using PCA! Using all 768 dimensions from BERT
+INFO:root:K MEANS with 50 Clusters, 768 dims, random seed = 450 (2
+INFO:root:Not using PCA! Using all 768 dimensions from BERT
+INFO:root:K MEANS with 100 Clusters, 768 dims, random seed = 372 (0
+INFO:root:Not using PCA! Using all 768 dimensions from BERT
+INFO:root:K MEANS with 100 Clusters, 768 dims, random seed = 936 (1
+INFO:root:Not using PCA! Using all 768 dimensions from BERT
+INFO:root:K MEANS with 100 Clusters, 768 dims, random seed = 450 (2
