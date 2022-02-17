@@ -66,7 +66,7 @@ def KMeansCalc(X, word_type_list, weights, n_clusters, seed, i, dim, write=False
     X["Weights"] = weights
 
     if write:
-        X.to_csv("results/test/beforererankandtop_{0}clusters_{1}dims_{2}seed.csv".format(n_clusters, dim, i))
+        X.to_csv("results/beforererankandtop_{0}clusters_{1}dims_{2}seed.csv".format(n_clusters, dim, i))
 
     # rerank top 100 with TF
 
@@ -88,14 +88,14 @@ def KMeansCalc(X, word_type_list, weights, n_clusters, seed, i, dim, write=False
     silhouette_avg = silhouette_score(X_t, cluster_labels)
 
 
-    out_file = "results/test/clusters_{0}clusters_{1}dims_{2}seed".format(n_clusters, dim, i)
+    out_file = "results/clusters_{0}clusters_{1}dims_{2}seed".format(n_clusters, dim, i)
 
     if write:
         of = open(out_file, 'w')
         top[["Cluster","Word_Type","Weights", "SqDist"]].to_csv(of)
         of.close()
 
-    cluster_file = "results/test/centroids_{0}clusters_{1}dims_{2}seed.csv".format(n_clusters, dim, i)
+    cluster_file = "results/centroids_{0}clusters_{1}dims_{2}seed.csv".format(n_clusters, dim, i)
     centroids = kmeans.cluster_centers_
 
     if write:
