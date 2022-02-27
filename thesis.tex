@@ -77,6 +77,7 @@
 \usepackage[colorlinks,linkcolor=blue,citecolor=blue,urlcolor=blue,bookmarks=false,hypertexnames=true]{hyperref}
 \usepackage{booktabs}
 \usepackage{arydshln}
+\usepackage{enumitem}
 
 \usepackage{graphicx}
 %\graphicspath{ {./images/} }
@@ -233,7 +234,20 @@ I need to write this!
 
 \chapter {Introduction}
 
-Write me. Put RQs and also why were using Sia et al over LDA
+Engaging with fact-checks is an increasingly standard part of our experience on social media. At least two giant social media companies launched community based, crowd-sourced efforts to fact-check their content in recent years: Facebook's community review in 2019 and Twitter's Birdwatch program in 2021 \cite{yasseri2021can}. These efforts run in parallel to automatic fact-checking methods, but have not received much attention from the natural language processing community. Twitter has open-sourced the Birdwatch dataset, a resource that has claims (tweets), fact-checks (Birdwatch notes), and labels (ratings). We use the Birdwatch dataset to investigate a fairly intuitive assumption about a crowd-sourced misinformation platform : fact-checks, that are rated by the community as helpful, should share topics with the content that they're fact-checking.
+
+We use a topic modeling method introduced by \cite{sia-etal-2020-tired} that defines topics as clusters of word type embeddings. The relative simplicity and low computational complexity of the method lends itself to social media settings.
+
+More formally we ask two research questions to guide the analysis:
+
+\begin{enumerate}[label=\textbf{RQ\arabic*.}]
+    \item  Do notes that have high topic overlap with their associated tweet get better
+ratings?
+    \item Can this method capture the helpful extra context that Birdwatch notes add to
+a tweet?
+\end{enumerate}
+This thesis aims to lay the groundwork for future analyses of the Birdwatch dataset (and other crowd-sourced fact-checking data) with topic models.
+
 
 % The utility of a clean, professionally prepared thesis is well
 % documented%
@@ -545,11 +559,11 @@ Finally,  we return to the question posed in RQ1 and evaluate if the average len
 
 \chapter{Discussion}
 
-We find a statistically significant negative relationship between the independent variable KL(N || T) and the dependent variable (helpfulness). The answer to RQ1 is yes: notes that have higher topic overlap with their tweets seem to get better, or more helpful, ratings. The directionality of KL divergence plays a role in this interpretation. While KL(N || T) was found to be a statistically significant variable, KL(T || N) was not. One possible explanation is that notes can add context to the tweet’s original content and alter the document’s topic distribution. Then, the additional average information to encode a tweet (based on code optimized for the note) would increase to accommodate the topic distribution shift.
+We find a statistically significant negative relationship between the independent variable $KL(N || T)$ and the dependent variable (helpfulness). The answer to RQ1 is yes: notes that have higher topic overlap with their tweets seem to get better, or more helpful, ratings. The directional nature of KL divergence plays a role in this interpretation. While $KL(N || T)$ was found to be a statistically significant variable, $KL(T || N)$ was not. One possible explanation is that notes can add context to the tweet’s original content and alter the document’s topic distribution. Then, the additional average information to encode a tweet (based on code optimized for the note) would increase to accommodate the topic distribution shift.
 
-Omitting short tweets results in a stronger relationship between KL(N || T) and helpfulness, and a statistically significant relationship with KL(T || N). However, omitting short notes results in no significant relationships at all. A possible explanation for this is that longer notes may add more context than short notes (intuitively, it would take more tokens to both address the tweet’s topic and add in new context to refute or support it). This explanation has some weight because the group of notes that are labeled as adding context are on average longer than notes that are not. However, there may be more reasons that can’t be easily captured by a topic model: it’s possible that Birdwatch users find concise, short notes more helpful or that short notes heavily depend on the sources that they link. For example, a note with three tokens that says “This is false [www. a trustworthy website . com]” may garner high ratings.
+Omitting short tweets results in a stronger relationship between $KL(N || T)$ and helpfulness, and a statistically significant relationship with $KL(T || N)$. However, omitting short notes results in no significant relationships at all. A possible explanation for this is that longer notes may add more context than short notes (intuitively, it would take more tokens to both address the tweet’s topic and add in new context to refute or support it) which would shift the topic distribution. Thus, KL divergence would increase while helpfulness also increases. This explanation has some weight because the group of notes that are labeled as adding context are on average longer than notes that are not. However, there may be more reasons that can’t be easily captured by a topic model: it’s possible that short notes share topics but are unhelpful (imagine a tweet that says ``The earth is flat!" and a note that uses a sarcasm indicator ``yes the the earth is flat! \verb|\|s").
 
-The answer to RQ2 is inconclusive. The method does seem to capture the extra context when considering a subset of data with ``Provides Important Context" in comparison to the full dataset. The relationship is between KL(N || T) and helpfulness for the notes that add context is weaker than in the full dataset. This may reflect that the labeled context-adding notes have less topic overlap but are still helpful. However, when considering the presence of the label as a binary variable, we get statistically insignificant results. This may be because the presence of a variable does not map perfectly to a binary trait. There may be a large amount of notes that add context but are not labeled as such.
+The answer to RQ2 is inconclusive. The method does seem to capture the extra context when considering a subset of data with \verb|Provides Important Context| in comparison to the full dataset. The relationship between $KL(N || T)$ and helpfulness for the notes that add context is weaker than in the full dataset. This may reflect that the labeled context-adding notes have less topic overlap but are still helpful. However, when considering the presence of the label as a binary variable, we get statistically insignificant results. This may be because the presence of a variable does not map perfectly to a binary trait. There may be a large amount of notes that add context but are not labeled as such.
 
 Document length creates difficulties with this method and the analysis of the research questions:
 
@@ -560,7 +574,7 @@ Document length creates difficulties with this method and the analysis of the re
 
 It’s possible that (1) could be re-mediated by using a test set with more documents to fill out the word co-occurrence matrix. These issues are connected: if (1) was re-mediated, it may be possible to find the topics that clearly have the highest NPMI scores and use them to weed out “catch all” topics, forcing a less uniform distribution.
 
-Overall, the method by Sia et al seems to work appropriately for the limited scope of these research questions. Given that this method minimizes computational complexity (cite Sia) it’s possible that this could be used to find “troll” responses that are off-topic as they are created.
+Overall, the method by \cite{sia-etal-2020-tired} seems to work appropriately for the limited scope of these research questions. Given that this method aims to minimize computational complexity it’s possible that this could be used to find “troll” responses that are off-topic as they are created.
 
 \chapter{Ethical Considerations}\label{ethicalconsiderations}
 
@@ -571,9 +585,11 @@ Following the guidelines from \cite{williams2017towards} and \cite{fiesler2018pa
 
 \chapter{Conclusion}
 
-Write me!
+This thesis examined topic overlap between Birdwatch notes and their associated tweets. The intuition behind this inquiry is quite simple: it makes sense that helpful fact-checks share topics with the content they are fact-checking. We examined this question using a method adopted from \cite{sia-etal-2020-tired} as an alternative to LDA and found that there is a statistically significant relationship between topic overlap ($KL(N || T$)) and helpfulness. This question was extended to try and find cases where notes add helpful additional context to a tweet with inconclusive results.
+While the methodology addressed the original research questions, future work and access to more data will be paramount for its use in applied settings.
+Future work may include researching a multilingual approach to capture the relationship between non-English tweets and their notes, using more tweet training data to increase word pair co-occurrences, and further work to understand how the Birdwatch annotation process may affect downstream tasks.
 
-*  We also do not claims about the effectiveness of one topic model over another
+
 
 
 % \section{What is it; why is it spelled that way;
@@ -1138,7 +1154,7 @@ Write me!
 \raggedbottom\sloppy
  \begin{figure}[h]
 \centering
-\includegraphics[scale=0.1]{screenshot.jpg}
+\includegraphics[scale=0.23]{screenshot.jpg}
 \caption{A screenshot of the Birdwatch user interface that shows that different labels that can be applied to a note }
 \label{fig:labels}
 \end{figure}
