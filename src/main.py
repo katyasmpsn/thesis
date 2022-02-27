@@ -22,7 +22,7 @@ logging.info("🎉 Successfully finished preprocessing Step")
 
 # Split into Train and Test sets
 clean_data = pd.read_csv("results/cleaned_data.csv")
-test_split = 0.99
+test_split = 0.4
 train, test = train_test_split(
     clean_data, test_size=test_split, random_state=4, shuffle=True
 )

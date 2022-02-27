@@ -5,6 +5,7 @@ import numpy as np
 import logging
 
 
+
 def readData():
     """
     reads in the test data to create a word-word freq matrix and the top words from the clusters to calculate NPMI
@@ -37,7 +38,6 @@ def defineWindow(test_data):
     )
     window = noteq1  # will use this as the window for NPMI calculations as handwavy approximation of what could capture
     # semantics for tweets
-    # TODO: research this!!!
     return int(window)
 
 
@@ -179,6 +179,9 @@ def avgClusterNPMI(cluster_words, stats, total_ct):
     # using len() to get total keys for mean computation
     # averaging all words in a cluster
 
+    # this is technically taking the average of both directions.
+    # {(biden,putin)=1, (putin,biden)=1} => (1+1)/2 = 1
+    # even though it should really be {(biden,putin)=1} => 1/1 = 1
     res = res / len(npmi_scores)
 
     return res, npmi_scores
@@ -230,7 +233,7 @@ def appendOtherMetrics(npmi_results, clusters):
 
     results = pd.merge(npmi_results, temp)
 
-    results.to_csv("results/npmi_eval.csv")
+    results.to_csv("results/npmi_eval_test.csv")
     return temp
 
 
@@ -238,9 +241,9 @@ nested_cluster_words, flattened_cluster_words, cluster_df, test_df = readData()
 window = defineWindow(test_df)
 cluster_df = omitMissingWords(cluster_df, flattened_cluster_words)
 wordword_freq, total_ct = mainPMIStats(nested_cluster_words, window)
-# npmi_score, word_scores = avgClusterNPMI(
-#     ["biden", "putin", "russia", "usa"], wordword_freq, total_ct
-# )
+npmi_score, word_scores = avgClusterNPMI(
+    ["biden", "putin", "russia", "usa"], wordword_freq, total_ct
+)
 scores, onewordclusters = runNPMI(cluster_df, wordword_freq, total_ct)
 logging.info("omitted {} one word clusters from the analysis".format(len(onewordclusters)))
 results = avgRandomSeeds(scores)

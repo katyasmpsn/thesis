@@ -40,7 +40,7 @@ def defineColumns(input_type):
             axis=0,
             ignore_index=True,
         )
-        # TODO: should i randomize the order so pca doesn't implicitly pick up on the order? should i even use pca rip
+        # TODO: should I randomize the order so pca doesn't implicitly pick up on the order? should i even use pca rip
 
     else:
         logging.debug("Incorrect argument! Please use `tweets` or `notes` or `both`")

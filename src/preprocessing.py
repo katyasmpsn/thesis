@@ -87,7 +87,6 @@ def textCleaning(rawtext):
     return " ".join(tokens)
 
 
-# TODO: WRITE ABOUT STOPWORDS. Omitting them from corpus stats but not as input for BERT
 
 
 def removeStopwords(tokens):
