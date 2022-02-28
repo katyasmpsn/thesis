@@ -121,7 +121,8 @@
 \setcounter{page}{-1}
 \abstract{
 
-I need to write this!
+This thesis examines topical consistency between content and fact-checks in the Birdwatch dataset published by Twitter. We find topics by clustering word type embeddings (following a method introduced by \cite{sia-etal-2020-tired}) to evaluate two research questions (1) Do notes that have high topic overlap with their associated tweet get better ratings? and (2) Can this method capture the helpful extra context that Birdwatch notes add to a
+tweet? Kullback-Leibler divergence is used to proxy topic overlap between the documents. We find that there is a statistically significant relationship between topic overlap and helpfulness but cannot establish a relationship between helpfulness and added context.
 
 %
 % This sample dissertation is an aid to students who are attempting
@@ -234,7 +235,7 @@ I need to write this!
 
 \chapter {Introduction}
 
-Engaging with fact-checks is an increasingly standard part of our experience on social media. At least two giant social media companies launched community based, crowd-sourced efforts to fact-check their content in recent years: Facebook's community review in 2019 and Twitter's Birdwatch program in 2021 \cite{yasseri2021can}. These efforts run in parallel to automatic fact-checking methods, but have not received much attention from the natural language processing community. Twitter has open-sourced the Birdwatch dataset, a resource that has claims (tweets), fact-checks (Birdwatch notes), and labels (ratings). We use the Birdwatch dataset to investigate a fairly intuitive assumption about a crowd-sourced misinformation platform : fact-checks, that are rated by the community as helpful, should share topics with the content that they're fact-checking.
+Engaging with fact-checks is an increasingly standard part of our experience on social media. At least two social media companies launched community based, crowd-sourced efforts to fact-check their content in recent years: Facebook's community review in 2019 and Twitter's Birdwatch program in 2021 \citep{yasseri2021can}. These efforts run in parallel to automatic fact-checking methods, but have not received much attention from the natural language processing community yet. Twitter has open-sourced the Birdwatch dataset, a resource that has claims (tweets), fact-checks (Birdwatch notes), and labels (ratings). We use the Birdwatch dataset to investigate a reasonably intuitive assumption about a crowd-sourced misinformation platform: fact-checks, that are rated by the community as helpful, should share topics with the content that they're fact-checking.
 
 We use a topic modeling method introduced by \cite{sia-etal-2020-tired} that defines topics as clusters of word type embeddings. The relative simplicity and low computational complexity of the method lends itself to social media settings.
 
@@ -317,21 +318,20 @@ We apply methods from natural language processing (NLP) to the misinformation fa
 
 \section{Alternatives to LDA}
 
- \cite{sia-etal-2020-tired} introduce a computationally-efficient alternative to classical topic models like LDA. The key theoretical addition in their work is to think of  topics as “clusters of word types” where word types can be represented by embeddings.  They tested different clustering techniques, using contextualized and non-contextualized embeddings, and incorporating  corpus statistics. They found that using term-frequency weighted KMeans clustering (with reranking of top word types with term-frequencies) yields topics that are comparably coherent to those generated with LDA.
+ \cite{sia-etal-2020-tired} introduce a computationally-efficient alternative to classical topic models like LDA. The key theoretical addition in their work is to think of  topics as “clusters of word types” where word types can be represented by embeddings.  They tested different clustering techniques, using contextualized and non-contextualized embeddings, and incorporating  corpus statistics. They found that using term-frequency weighted KMeans clustering (with re-ranking of top word types with term-frequencies) yields topics that are comparably coherent to those generated with LDA.
 
  \cite{chen2016short} and \cite{pang2016mr} note the difficulties of using LDA on short documents because of the heavy noise and lack of sufficient word co-occurrences. They propose methods to modify LDA, primarily as part of classification tasks.
 
-MOVE ME TO INTO?
- Given the computational-efficiency and relative simplicity of the method proposed by \cite{sia-etal-2020-tired}, it seems to be a good fit for the fast-moving fact-checking space.
+ The computational-efficiency and relative simplicity of the method proposed by \cite{sia-etal-2020-tired} makes it a good candidate for the fast-moving fact-checking space.
 
  \section{Topic Modeling and Fact-Checking}
- Elements of topic modeling has been applied to automatic fact verification. \cite{si-etal-2021-topic} propose a model that checks for topical consistency (using LDA) between a claim and pieces of evidence, and classifies the evidence as supporting or refuting the claim. \cite{Hardalov2021ASO}, in a survey paper on stance detection (often used in fact-checking tasks),  note that the benefits of using unsupervised topic models are limited because they tend to be noisy. \cite{hanselowski-etal-2018-retrospective} evaluates methods in a Fake News Challenge and found that methods that used features from topic models did not capture semantic relationships necessary to do well on the task. These challenges emphasize the need to evaluate new topic modeling methods in the fact-checking area.
+ Elements of topic modeling have been applied to automatic fact verification. \cite{si-etal-2021-topic} propose a model that checks for topical consistency (using LDA) between a claim and pieces of evidence, and classifies the evidence as supporting or refuting the claim. \cite{Hardalov2021ASO}, in a survey paper on stance detection (often used in fact-checking tasks),  note that the benefits of using unsupervised topic models are limited because they tend to be noisy. \cite{hanselowski-etal-2018-retrospective} evaluate methods in a Fake News Challenge and found that methods that used features from topic models did not capture the semantic relationships necessary to do well on the task. These challenges emphasize the need to evaluate new topic modeling methods in the fact-checking area.
 
  As far as the author is aware, this thesis is the first attempt to use the method introduced by \cite{sia-etal-2020-tired} in a fact-checking context. This thesis is also limited in comparison to the goals usually seen in fact-checking literature: we aim to learn about topic overlap between content and crowd-sourced fact-checks, not to classify the content.
 
  \section{Background on Twitter's Birdwatch}
 
-Twitter introduced Birdwatch in 2021 \citep{coleman_2021} in an effort to identify and annotate misinformation on their platform. Birdwatch is community-based and relies on users to perform three mechanisms: labelling tweets as \verb|misleading| or \verb|not misleading|, writing annotations (``notes") for tweets, and rating each other's notes for quality. The data generated from these mechanisms is freely available in the US on the \href{https://twitter.github.io/birdwatch/}{Birdwatch User Guide}.
+Twitter introduced Birdwatch in 2021 \citep{coleman_2021} in an effort to identify and annotate misinformation on their platform. Birdwatch is community-based and relies on users to perform three mechanisms: labeling tweets as \verb|misleading| or \verb|not misleading|, writing annotations (``notes") on the tweets, and rating each other's notes for quality. The data generated from these mechanisms is freely available in the US on the \href{https://twitter.github.io/birdwatch/}{Birdwatch User Guide}.
 
 This thesis refers to the Birdwatch program and
 the Birdwatch dataset. The Birdwatch program is
@@ -341,15 +341,12 @@ focus of the Twitter Birdwatch team. The dataset is
 the output of the program: the data generated by
 users writing and rating notes.
 
-The Birdwatch dataset has not been widely studied in the NLP community, likely because of how new and relatively small it is (though the widespread analysis of Twitter's tweet data \citep{antonakaki2021survey} may indicate that the Birdwatch dataset will inevitably also be analyzed at scale). It has been evaluated from a security standpoint, examining sociotechnical vulnerabilities of the program \citep{benjamin2021watches}. The benefits and pitfalls of crowd-sourced fact-checking for Birdwatch have been studied by \cite{yasseri2021can}. \cite{allen2021birds} used Birdwatch data in an experiment that found that partisanship of Birdwatch users is highly correlated with the type of notes they write. The crowd-sourced nature of Birdwatch, and the many design considerations that are necessary for good social media data use, are briefly examined in the Ethical Considerations section (\ref{ethicalconsiderations}).
-
-
-
+The Birdwatch dataset has not been widely studied in the NLP community, likely because of how new and relatively small it is (though the widespread analysis of Twitter's tweet data \citep{antonakaki2021survey} may indicate that the Birdwatch dataset will inevitably also be analyzed at scale). It has been evaluated from a security standpoint, examining sociotechnical vulnerabilities of the program \citep{benjamin2021watches}. The benefits and pitfalls of crowd-sourced fact-checking in the program have been studied by \cite{yasseri2021can}. \cite{allen2021birds} used Birdwatch data in an experiment that found that partisanship of Birdwatch users is highly correlated with the type of notes they write. The crowd-sourced nature of Birdwatch, and the many design considerations that are necessary for good social media data use, are briefly examined in the Ethical Considerations section (\ref{ethicalconsiderations}).
 
 
 \chapter{Methodology}
 
-We replicate the method from \cite{sia-etal-2020-tired}, with some modifications, to create clusters of word types from the Birdwatch corpus and treat those clusters as learned topics.
+We replicate the method from \cite{sia-etal-2020-tired}, with some modifications, to create clusters of word types from the Birdwatch dataset and treat those clusters as learned topics.
 
 \section{Birdwatch Terminology}
 
@@ -357,8 +354,8 @@ We replicate the method from \cite{sia-etal-2020-tired}, with some modifications
 
 \begin{itemize}
 \item \textbf{Note}: a fact-checking annotation that is in response to a tweet. Notes usually include linked sources
-\item \textbf{Tweet}: we think of tweets as the ``sister" document (or ``claim") that a note references. A tweet can have multiple notes.
-\item \textbf{Rating}: users can mark a note as ``Helpful", ``Somewhat Helpful", or ``Not Helpful" and label it with several other tags. The rating system is an effort to maintain the quality of notes. It allows the Birdwatch program to hide largely unhelpful notes and emphasize very helpful notes in Twitter's user interface. A note can have multiple ratings.
+\item \textbf{Tweet}: we think of a tweet as a ``sister" document (or ``claim") that a note references. A tweet can have multiple notes.
+\item \textbf{Rating}: users can mark a note as ``Helpful", ``Somewhat Helpful", or ``Not Helpful" and label it with several other tags. The ratings help the Birdwatch program manage fact-checking quality. A note can have multiple ratings.
 \end{itemize}
 
 The term ``document" is used to refer to both notes and tweets.
@@ -366,25 +363,27 @@ The term ``document" is used to refer to both notes and tweets.
 
 \section{Data Collection and Preprocessing}\label{section:preprocessing}
 
-The data was downloaded from the \href{https://twitter.github.io/birdwatch/download-data/}{Birdwatch github site} as two TSV files (one for notes and one for ratings) that includes data up to Jan 30th, 2022. This represents nearly a full year’s of data since the Birdwatch program was launched \cite{coleman_2021}. The notes data contains tweet IDs that map to the to the tweets being fact-checked. The DocNow hydrator \citep{docnow_hydrator} is used to obtain the tweet metadata (including the text) from the list of tweet IDs in accordance with Twitter’s use of service terms. Maintaining the mapping of a note and its associated tweet is not necessary while generating and clustering the embeddings but will be when testing for the topic overlap between the notes and tweets in the Experiment section \ref{section:experiments}.
+The data was downloaded from the \href{https://twitter.github.io/birdwatch/download-data/}{Birdwatch github site} as two TSV files (one for notes and one for ratings) that includes data up to Jan 30th, 2022. This represents nearly a full year of data since the Birdwatch program was launched \cite{coleman_2021}. The notes data contains tweet IDs that map to the fact-checked tweets. The DocNow hydrator \citep{docnow_hydrator} was used to obtain the tweet metadata (including the text) from the list of tweet IDs in accordance with Twitter’s terms of service. Maintaining the mapping of a note and its associated tweet is not necessary while generating and clustering the embeddings but will be necessary when testing for the topic overlap between documents in the Experiment section \ref{section:experiments}.
 
-Birdwatch was piloted in the US and most of the notes are written in English, although they could fact-check a non-English tweet. Later on in this method, a BERT model pre-trained on English \citep{DBLP:journals/corr/abs-1810-04805} will be used to generate embeddings for the documents . Thus, a minority of tweets without the English metadata labels were omitted. In the future, a multilingual approach could be used.
+Birdwatch was piloted in the US and most of the notes are written in English, although they could fact-check a non-English tweet. Later on in this method, a BERT model pre-trained on English \citep{DBLP:journals/corr/abs-1810-04805} will be used to generate embeddings for the documents. Thus, a minority of tweets without English metadata labels were omitted. In the future, a multilingual approach could be used.
 
-The documents are lower-cased with usernames, hashtags, urls, and digits omitted. The preprocessing step returns two outputs for each document: (1) a cleaned string that will be used by BERT (2) and a list of cleaned tokens with stopwords omitted that will be used to calculate corpus statistics. The first output  is a departure from the method outlined by \cite{sia-etal-2020-tired}, who omitted stopwords prior to generating the BERT embeddings. \cite{Qiao2019UnderstandingTB} find that omitting stopwords does not harm the performance of a BERT ranking task although they receive as much attention as non-stopwords. We use that finding to assume that BERT is ambivalent to stop-word removal and leave them in for this task because of the short document length of tweets and notes, hoping to get higher context embeddings. We remove stopwords prior to calculating term-frequencies in \ref{section:corpusstats} because we want to cluster over a meaningful vocabulary to create topics.
+The documents are lower-cased with usernames, hashtags, urls, and digits omitted. The preprocessing step returns two outputs for each document: (1) a cleaned string that will be used by BERT (2) a list of cleaned tokens with stopwords omitted that will be used to calculate corpus statistics. The first output  is a departure from the method outlined by \cite{sia-etal-2020-tired}, who omitted stopwords prior to generating the BERT embeddings. \cite{Qiao2019UnderstandingTB} find that omitting stopwords does not harm the performance of a BERT ranking task although they receive as much attention as non-stopwords. We use that finding to assume that BERT is ambivalent to stop-word removal and leave them in for this task because of the short document length, hoping to generate higher context embeddings. We remove stopwords prior to calculating term-frequencies in \ref{section:corpusstats} because we want to cluster over a meaningful vocabulary to create topics.
 
 \section{Train/Test Split}\label{section:traintest}
-We use a 60/40 train/test split. The train data is used to calculate corpus statistics and generate the word type embeddings, which are then clustered. The test data is used to evaluate the output of the train data clusters for topic coherence. The test/train split is necessary because the output topics are generated with term-frequency statistics and the primary evaluation method (Normalized PMI) will also depend on term-frequency statistics
+We use a 60/40 train/test split. The train data is used to calculate corpus statistics and generate and cluster the word type embeddings. The test data is used to evaluate the top words from the output clusters. The test/train split is necessary because the output topics are generated with term-frequency statistics and the primary evaluation method (Normalized PMI) also depends on corpus statistics.
 
 \section{Corpus Statistics}\label{section:corpusstats}
-Term frequencies (which will be used as weights while clustering word type embeddings) are calculated from the train data, using both notes and tweets to create the vocabulary. \cite{sia-etal-2020-tired} found that term frequencies (tf) are the most successful corpus statistics for this purpose and we follow their standard definition: $$ \textbf{tf} = \frac{n_t}{\Sigma_{t'}n_{t'}} $$  where $n_t$ is the count of a word type $t$. The final vocabulary size contains 23,090 word types.
+Term-frequencies are calculated from the documents in the train dataset. \cite{sia-etal-2020-tired} found that term frequencies (tf) are the most successful corpus statistics for this purpose and we follow their standard definition: $$ \textbf{tf} = \frac{n_t}{\Sigma_{t'}n_{t'}} $$  where $n_t$ is the count of a word type $t$. The final vocabulary contains 23,090 word types.
 
-\section{Generating BERT Embeddings}{section:embeddings}
+\section{Generating BERT Embeddings}\label{section:embeddings}
 Token embeddings are created using the BERT base model \cite{DBLP:journals/corr/abs-1810-04805}  (\verb|bert-base-uncased| pipeline from Huggingface).
-A full note or tweet is used as the context window and the last hidden layer is taken as the token’s embedding. Following the method from \cite{sia-etal-2020-tired}, subword representations are averaged. This method can generate different embeddings for the identical tokens because of their different context windows. These word token embeddings are averaged to create word type embeddings.
+The full document is used as the context window and the last hidden layer is taken as the token’s embedding. Following the method from \cite{sia-etal-2020-tired}, subword representations are averaged. This method can generate different embeddings for the identical tokens because of their different context windows. These word token embeddings are averaged to create word type embeddings.
 
 \section{Clustering}\label{section:clustering}
 
-The final step to find topics is to cluster the word type embeddings. \cite{si-etal-2021-topic} found that using the KMeans algorithm with term frequency weights to create the clusters, and using the weights to re-rank the top word types is effective. Prior to clustering, they also use PCA to reduce dimensions of the embeddings, noting that the method allows for significant dimension reductions (up to 80\%). This step is primarily to reduce the computational complexity of the process. Their method is followed: we use the tf weights calculated in \ref{section:corpusstats} with the KMeans algorithm \citep{scikit-learn}, and re-rank the word types in each cluster according to tf weights to find the most representative top word types.
+The final step to find topics is to cluster the word type embeddings.
+% \cite{sia-etal-2020-tired} found that using the KMeans algorithm with term frequency weights to create the clusters, and using the weights to re-rank the top word types is effective.
+\cite{sia-etal-2020-tired} use PCA to reduce the dimensionality of the embeddings prior to clustering, noting that the method allows for significant dimension reductions (up to 80\%). Their method is followed: we use the tf weights calculated in \ref{section:corpusstats} with a KMeans algorithm implementation \citep{scikit-learn}, and re-rank the word types in each cluster according to the tf weights to find the most representative top word types.
 
 Two hyperparameters are considered: the number of clusters for the KMeans algorithm (the number of topics) and the number of dimensions for PCA reduction.
 
@@ -401,9 +400,11 @@ The top ten words of the the first cluster generated (with twenty total clusters
 
 In order to evaluate the coherence of the generated topic clusters, we follow \cite{sia-etal-2020-tired} and use Normalized Pointwise Mutual Information (NPMI) \citep{bouma2009normalized}.   NPMI is defined as $$\textbf{NPMI}(x,y) = \frac{\ln\frac{p(x,y)}{p(x)p(y)}}{-\ln(p(x,y))}$$
 
-where $p(x)$ and $p(y)$ correspond to the probability of seeing words $x$ and $y$, and $p(x,y)$ correspond the probability of words co-occuring. The probabilities are calculated from the test data. We calculate NPMI for  the top 10 words for each cluster over each permutation of hyperparameters. The window for the PMI calculation indicates if it will capture a syntactic or semantic relationship \citep{jurafsky_martin_2019}. We use the first quartile of note length (14 tokens) as the window; intending to capture semantic relationship. The NPMI scores are averaged over three random seeds.  NPMI has a range from [-1,1] where 1 would indicate that two words only occur together and -1 indicates that they would be completely independent of each other.
+where $p(x)$ and $p(y)$ correspond to the probability of seeing words $x$ and $y$, and $p(x,y)$ corresponds to the probability of words co-occurring. The probabilities are calculated from the test data. We calculate NPMI for  the top 10 words of each cluster over every hyperparameter permutation. The window for the PMI calculation indicates if it will capture a syntactic or semantic relationship \citep{jurafsky_martin_2019}. We use the first quartile of note length (14 tokens) as the window; intending to capture semantic relationships. The NPMI scores are averaged over three random seeds.  NPMI has a range from [-1,1] where 1 would indicate that two words only occur together and -1 indicates that they would be completely independent of each other.
 
-NPMI is a metric based on vector semantics and provides a measure of similarity based on how often words co-occur. It has been found to correlate to human judgements \citep{lau2014machine} . However, it's also possible to evaluate clusters with alternative metrics that aren't based on word co-occurrence. We look into a distance-based internal clustering validation method, hoping to  reinforce any findings from the NPMI method. We include silhouette scores \citep{liu2010understanding}  to capture how far a top word’s embedding is to its cluster centroid and how far it is to other cluster's centroids. Similar to NPMI, it has a range from [-1,1] where -1 indicates that the top word may be in between or belong to several clusters, 0 indicates that there are overlapping clusters, and 1 indicates that the top word is perfectly contained in one distinct cluster. The mean score is then calculated over all the top words in a cluster  \citep{scikit-learn}.
+% NPMI is a metric based on vector semantics and provides a measure of similarity based on how often words co-occur.
+
+NPMI has been found to correlate to human judgements \citep{lau2014machine}. However, it's also possible to evaluate clusters with alternative metrics that aren't based on word co-occurrence. We look into a distance-based internal clustering validation method, hoping to  reinforce any findings from the NPMI scores. We include silhouette indices \citep{liu2010understanding}  to capture how far a top word’s embedding is to its cluster centroid and how far it is to other cluster's centroids. Similar to NPMI, it has a range from [-1,1] where -1 indicates that the top word may be in between or belong to several clusters, 0 indicates that there are overlapping clusters, and 1 indicates that the top word is perfectly contained in one distinct cluster. The mean score is then calculated over all the top words in a cluster  \citep{scikit-learn}.
 
 
 \begin{table}
@@ -432,7 +433,7 @@ NPMI is a metric based on vector semantics and provides a measure of similarity 
 
 
 
-The evaluation metrics are presented in Table \ref{fig:Cluster_Evaluation}. The NPMI scores are all negative which makes sense when we consider how short the documents are and how few (approximately 15,000) are available in the test set. High joint probabilities p(x,y) are relatively scarce and often are 0.  That is to say, the words exist separately but don’t occur together, resulting in an NPMI score of -1. This isn't entirely unexpected. It aligns with known problems about LDA which also suffers from sparse word co-occurrences when used on short social media text \citep{chen2016short}, \citep{pang2016mr}.
+The evaluation metrics are presented in Table \ref{fig:Cluster_Evaluation}. The NPMI scores are all negative which makes sense when we consider how short the documents are and how few (approximately 15,000) are available in the test set. High joint probabilities p(x,y) are relatively scarce and are often 0.  That is to say, the words exist separately but don’t occur together, resulting in an NPMI score of -1. This isn't entirely unexpected and aligns with known problems about LDA which also depends on word co-occurrences and does poorly when used on short social media text \citep{chen2016short}, \citep{pang2016mr}.
 
 As an example, we can look at the NPMI scores for a fake cluster of words that should intuitively be highly correlated with each other. Consider [``biden", ``putin", ``russia", ``usa"]. We see that the pairwise NPMI is relatively low (Table \ref{fig:Missing_Pairs}), with the average being pulled to -1 because “putin” and “usa” don’t co-occur in the test set
 
@@ -455,9 +456,9 @@ russia &    usa &              0.12 \\
 \label{fig:Missing_Pairs}
 \end{table}
 
-The silhouette scores in Table \ref{fig:Cluster_Evaluation}  are close to zero because of high dimensionality of the data. \cite{kriegel2009clustering} note that one of the problems with evaluating clusters in high dimensions is that the concept of distance becomes less meaningful.  Interpreting distance metrics in high dimensions is a known problem \cite{tomavsev2016clustering} and limit the usefulness of silhouette indices and other distance based metrics.
+The silhouette scores in Table \ref{fig:Cluster_Evaluation}  are close to zero because of high dimensionality of the data. \cite{kriegel2009clustering} note that one of the problems with evaluating clusters in high dimensions is that the concept of distance becomes less meaningful.  Interpreting distance metrics in high dimensions is a known problem \citep{tomavsev2016clustering} and limit the usefulness of silhouette indices and other distance based metrics.
 
-Assuming that NPMI will have a baseline of close to -1; we take the permutation of hyperparameters that results in the highest NPMI (which, perhaps coincidentally, has the the highest silhouette score) and use 20 clusters and 768 dimensions.
+Assuming that NPMI will have a baseline of close to -1 for this task, we take the permutation of hyperparameters that results in the highest NPMI (which, perhaps coincidentally, has the highest silhouette score) and use 20 clusters and 768 dimensions.
 
 Topic clusters (and all of their constituent word type embeddings) are re-generated with these parameters for analysis of the research questions. PCA is not used but should be re-considered if computational complexity becomes more of a concern (for example, if Birdwatch is more widely used and the dataset becomes much larger).
 
@@ -469,11 +470,12 @@ Topic clusters (and all of their constituent word type embeddings) are re-genera
 }
 
 
-Topic overlap is defined as the similarity between a tweet’s topic probability distribution and a note’s topic probability distribution. \cite{sia-etal-2020-tired} propose an extension to their method to find the top topics per document, which is slightly modified for this analysis. Using the word type embeddings,  the pairwise cosine similarity between each token in a document and cluster centroid is calculated. The token similarities are summed over the clusters to create a document similarity vector. This vector is then normalized with a softmax function yielding a probability distribution for the document over the possible topics.
+Topic overlap is defined as the similarity between a tweet’s topic probability distribution and a note’s topic probability distribution. \cite{sia-etal-2020-tired} propose an extension to their method to find the top topics per document which is slightly modified for this analysis. Using the word type embeddings,  the pairwise cosine similarity between each token in a document and cluster centroid is calculated. The token similarities are summed over the clusters to create a document similarity vector. This vector is then normalized with a softmax function yielding a probability distribution for the document over the possible topics.
 
-Kullback–Leibler (KL) divergence is used to measure topic overlap using the document probability distributions. KL divergence captures the average number of extra bits required to encode a note’s topic distribution N using code optimized for a tweet’s topic distribution \citep{Murphy2012}. More generally, it represents the average amount of information needed to discriminate between N and T. It is not a symmetric measure. $KL(N || T)$ represents the case where the probability distribution of the note is compared to the tweet’s (or, how many average bits of information it would take to encode the note with code optimized for a tweet) . This direction intuitively captures the research question where the note is a response to a tweet, and is expected to have something in common with it. For a complete analysis, both directions will be computed. For a “yes” answer to RQ1, a negative relationship is expected: if the KL divergence is high, then the topic distributions are dissimilar, and helpfulness would be low. KL divergence was calculated with SciPy \citep{2020SciPy-NMeth}.
+Kullback–Leibler (KL) divergence is used to measure topic overlap using the document probability distributions. KL divergence captures the average number of extra bits required to encode a note’s topic distribution N using code optimized for a tweet’s topic distribution T \citep{Murphy2012}. More generally, it represents the average amount of information needed to discriminate between N and T. It is not a symmetric measure. $KL(N || T)$ represents the case where the probability distribution of the note is compared to the tweets (or, how many average bits of information it would take to encode the note with code optimized for the tweet). This direction intuitively captures the research question where the note is a response to a tweet, and is expected to have something in common with it. For a complete analysis, both directions will be computed. For a “yes” answer to RQ1, a negative relationship is expected: if the KL divergence is high, then the topic distributions are dissimilar, and helpfulness would be low. KL divergence was calculated with SciPy \citep{2020SciPy-NMeth}.
 
-The other side of the research question is about ratings. Birdwatch provides user generated ratings in two categories. The \verb|helpful| category has two choices “Helpful” and “Not Helpful”. The \verb|helpfulnessLevel| category, added later to Birdwatch according to the user guide, has three choices “Helpful”, “Somewhat Helpful”, and “Not Helpful”. These options are mapped to numeric counterparts (-1, 0, 1) and the outcome variable for this analysis is defined as the average of the numeric counterparts for a note. It should be noted that note/tweet pairs created before the launch of the \verb|helpfulnessLevel| category may have a slightly different distribution in comparison to pairs created after the launch, but the effect of this is left to further research.
+The other side of the research question is about ratings. Helpfulness ratings are stored in two categories. The deprecated \verb|helpful| category has two choices “Helpful” and “Not Helpful”. The currently used \verb|helpfulnessLevel| category adds a ``Somewhat Helpful" choice. These options are mapped to numeric counterparts (Not Helpful : -1, Somewhat Helpful : 0, Helpful : 1) and the outcome variable for this analysis is defined as the average of the numeric helpfulness ratings for a note. It should be noted that note/tweet pairs created before the launch of the \verb|helpfulnessLevel| category may have a slightly different distribution in comparison to pairs created after the launch, but the effect of this is left to further research.
+
 Finally, the helpfulness level of the notes  is linearly regressed against KL divergence of note/tweet pairs. Robust standard errors are used because the outcome variable is not normal.
 The results are in Table \ref{fig:RQ1_OLS}.
 
@@ -501,51 +503,54 @@ Regressor &  Note Min &  Tweet Min &   Coef(SE) \\
 
 The relationship between helpfulness and $KL(N \|T)$ is statistically significant and negative.
 
-Document length has a strong effect on this analysis. If a document has a low amount of words, the document similarity vector (the summed cosine similarity between tokens and cluster centroids) will be flattened because of the low information content. We can gain intuition for this by looking at the uniformity of the distribution by document length. KL divergence from a uniform distribution is calculated for each document’s topic distribution.There is a clear trend in Fig \ref{fig:uniform}, for both notes and tweets, that shows that shorter documents are more similar to the uniform distribution.
+Document length has a strong effect on this analysis. If a document has a low amount of words, the document similarity vector (the summed cosine similarity between tokens and cluster centroids) will be flattened because of the low information content. We can gain intuition for this by looking at the uniformity of the distribution by document length. KL divergence from a uniform distribution is calculated for each document’s topic distribution.There is a clear trend in Fig \ref{fig:uniform}, for both notes and tweets, where shorter documents are more similar to the uniform distribution.
 
 \begin{figure}[h]
 \centering
 \includegraphics[scale=0.6]{KLUniform.png}
-\caption{Uniformity as a function of length}
+\caption{KL Divergence of a document's topic distribution and a uniform topic distribution as a function of length}
 \label{fig:uniform}
 \end{figure}
 
-A uniform distribution for possible topics suggests that this topic model method is not well suited for short documents: it fails to return the top topics per document. If we omit “short” tweets (below the first quartile without stopwords, or 8 tokens), the relationship between KL divergence and helpfulness becomes statistically significantly negative for the tweet to note direction as well. Interestingly, this is not the case when short notes are omitted. This could be because helpful notes may add extra context, modifying the topic distribution. This line of reasoning is continued in the analysis of RQ 2 in section \ref{section:RQ2}.
+A uniform topic distribution suggests that this method is not well suited for very short documents and fails to find clear top topics for them. If we omit “short” tweets (below the first quartile without stopwords, or 8 tokens), the relationship between KL divergence and helpfulness becomes statistically significantly negative for the $T || N$  direction as well. Interestingly, this is not the case when short notes are omitted. This could be because helpful notes may add extra context, modifying the topic distribution. This line of reasoning is continued in the analysis of RQ2 (section \ref{section:RQ2}).
 
-We also tried a model specification geared towards separately identifying the impact of the KL distance between notes and tweets and the length of both the notes and the tweets on the helpfulness level. This model showed:
+We also tried a model specification geared towards separately identifying the impact of KL divergence and document length on the helpfulness level. This model showed:
 
 \begin{itemize}
-    \item that the KL distance was still a statistically-significant predictor of the helpfulness in the presence of the other features
-    \item that there was no heterogeneous effect. The KL distance interactions with either note length or tweet length were not statistically significant. This tells us that tweet and note lengths don’t strengthen the relationship between the Kullback-Leibler distance and the helpfulness.
+    \item KL divergence is a  statistically-significant predictor of the helpfulness in the presence of the other features
+    \item there is no heterogeneous effect. The KL divergence interactions with either note length or tweet length are not statistically significant.
 
 \end{itemize}
+
+This tells us that document length itself does not strengthen the relationship between the KL divergence and the helpfulness.
 
  \section{Research Question 2}\label{section:RQ2}
 
 \textbf{Can this method capture the helpful extra context that Birdwatch notes add to a tweet?}
 
-Birdwatch users can label notes in a variety of ways after marking them as helpful (see figure \ref{fig:labels} as an example). Labels are not required to submit a rating so we make the assumption that the presence of at least one label per note is enough to associate the label’s trait with that note. For example, a note may have only one “Easy to Understand” label even though it has multiple ratings.
+Birdwatch users can label notes in a variety of ways after marking them as helpful (see figure \ref{fig:labels} as an example). Labels are not required to submit a rating so we assume that the presence of at least one label per note is sufficient to associate the label’s trait with the note. For example, a note may have only one “Easy to Understand” label even though it has multiple ratings.
 
 
 
-Intuitively, we can think of a note's extra context as a shift in the topic probability distribution when compared to its tweet. Figure \ref{fig:highcontext} shows an example.
+Intuitively, we can think of a note's extra context as a shift in the topic probability distribution when compared to its tweet. Figure \ref{fig:highcontext} shows an example. This research question will also be addressed using document topic distributions and focus on $KL(N || T)$ because it more clearly captures the note-tweet relationship. We try to approach the question from three different angles.
 
 \begin{figure}[h]
 \centering
 \includegraphics[scale=0.6]{HighContext.png}
-\caption{This note was labeled as helpful because it adds important context. There is a shift in its topic distribution in comparison to the tweet }
+\caption{Document topic distributions for a note that adds context  }
 \label{fig:highcontext}
 \end{figure}
 
-This research question will also be addressed using document topic probability distributions and focus on $KL(N || T)$ because it more clearly captures the note-tweet relationship. We try to approach the question from three different angles.
 
-First, we find a subset of the data with \verb|Provide Important Context| labels and ask ``Will helpfulness increase as $KL(N || T)$ increases?" $$helpfulness \sim KL(N || T)$$ This is the same linear regression that was used in RQ1 but on subset of the original data. The result is statistically significant and negative: if the topics are similar then helpfulness still increases.  However, the coefficient is lower than when calculated over the entire dataset (row 1 of Table Y). Being on-topic is a less strong lever for helpfulness when considering notes marked with the “Provides Important Context” label.
+First, we find a subset of the data with \verb|Provide Important Context| labels and ask ``Will helpfulness increase as $KL(N || T)$ increases?" $$helpfulness \sim KL(N || T)$$ This is the same linear regression that was used in RQ1 but on subset of the original data. The result is statistically significant and negative: if the topics are similar then helpfulness still increases.  However, the coefficient $-0.21(0.054)$ is slightly lower than when calculated over the entire dataset (row 1 of Table \ref{fig:RQ1_OLS}).
+
+% Being on-topic is a less strong lever for helpfulness when considering notes marked with the “Provides Important Context” label.
 
 Second, we return to considering the entire dataset and ask ``Does the presence of the add context label increase the effect of $KL(N || T)$ on helpfulness?" $$helpfulness \sim KL(N || T) + context\_add + KL(N || T) \times context\_add$$ We find that the addition of the \verb|Provides Important Context| label is not a strong lever and there are no heterogeneous effects.
 
 Third, we continue to consider the entire dataset and ask ``What is the effect of $KL(N || T)$ on the probability of having add context label?". $$context\_add \sim KL(N || T)$$ The label's presence is a binary variable so a logistic regression is used and we find that there is not a statistically significant effect.
 
-Birdwatch's rating mechanisms are not complete from an annotation perspective. The lack of certain label cannot be a indicator that the label truly does not apply. Certain notes may be labeled as adding context but it's very possible that there is a large proportion of notes that do indeed add context but have not been labeled as such. This casts some doubt on non-significant results from the second and third lines of inquiry which assume that $context\_add$ is binary variable that reflects the ground truth.
+Birdwatch's rating mechanisms are not complete from an annotation perspective. The lack of certain label cannot be a indicator that the label truly does not apply. It's possible that there is a large proportion of notes that add context but have not been labeled as such. This casts some doubt on non-significant results from the second and third lines of inquiry which assume that $context\_add$ is binary variable that maps to a ground-truth.
 
 % RQ2 is approached in a similar way to  use the “Provides Important Context” label to find a subset of the documents where the notes helpfully add context to the tweet’s subject matter.
 
@@ -555,15 +560,17 @@ Birdwatch's rating mechanisms are not complete from an annotation perspective. T
 
 % The result is statistically significant and negative: if the topics are similar then helpfulness still increases.  However, the coefficient is lower than the original dataset: being on-topic is a less strong lever for notes marked with the “Provides Important Context” label.
 
-Finally,  we return to the question posed in RQ1 and evaluate if the average length of the notes differs between the ones with context-adding  labels and the ones without, using a two-sided t-test. It yields a t-statistic of statistic=-10.985 with a p-value $< 0.0001$. That is, the context adding subset has statistically significantly longer notes than the notes that don’t have that label. This adds some credence to interpretation from RQ1: omitting short notes leads to an insignificant relationship between KL divergence and helpfulness because longer notes may add context and shift the topic distribution. Note that the caveat about Birdwatch's incomplete annotations applies to this analysis as well.
+Finally,  we return to the question posed in RQ1 and evaluate if the average length of the notes differs between the ones with context-adding  labels and the ones without, using a two-sided t-test. It yields a t-statistic of statistic=-10.985 with a p-value $< 0.0001$. That is, the context adding subset has statistically significantly longer notes than the notes that don’t have that label. This adds some credence to interpretation from RQ1: omitting short notes leads to an insignificant relationship because helpful, longer notes may add context and shift the topic distribution increase KL divergence. Note that the caveat about Birdwatch's incomplete annotations applies to this analysis as well.
 
 \chapter{Discussion}
 
-We find a statistically significant negative relationship between the independent variable $KL(N || T)$ and the dependent variable (helpfulness). The answer to RQ1 is yes: notes that have higher topic overlap with their tweets seem to get better, or more helpful, ratings. The directional nature of KL divergence plays a role in this interpretation. While $KL(N || T)$ was found to be a statistically significant variable, $KL(T || N)$ was not. One possible explanation is that notes can add context to the tweet’s original content and alter the document’s topic distribution. Then, the additional average information to encode a tweet (based on code optimized for the note) would increase to accommodate the topic distribution shift.
+We find a statistically significant negative relationship between the independent variable $KL(N || T)$ and the dependent variable (helpfulness). We can answer a narrow version of RQ1 with some confidence: notes that have higher topic overlap with their tweets seem to get better, or more helpful, ratings. The directional nature of KL divergence plays a role in this interpretation. While $KL(N || T)$ was found to be a statistically significant variable, $KL(T || N)$ was not. One possible explanation is that notes can add context to the tweet’s original content and alter the document’s topic distribution. Then, the additional average information to encode a tweet (based on code optimized for the note) would increase to accommodate the topic distribution shift.
 
-Omitting short tweets results in a stronger relationship between $KL(N || T)$ and helpfulness, and a statistically significant relationship with $KL(T || N)$. However, omitting short notes results in no significant relationships at all. A possible explanation for this is that longer notes may add more context than short notes (intuitively, it would take more tokens to both address the tweet’s topic and add in new context to refute or support it) which would shift the topic distribution. Thus, KL divergence would increase while helpfulness also increases. This explanation has some weight because the group of notes that are labeled as adding context are on average longer than notes that are not. However, there may be more reasons that can’t be easily captured by a topic model: it’s possible that short notes share topics but are unhelpful (imagine a tweet that says ``The earth is flat!" and a note that uses a sarcasm indicator ``yes the the earth is flat! \verb|\|s").
+Omitting short tweets results in a stronger relationship between $KL(N || T)$ and helpfulness, and a statistically significant relationship with $KL(T || N)$. However, omitting short notes results in no significant relationships at all. A possible explanation for this is that helpful, longer notes may add more context than short notes (intuitively, it would take more tokens to both address the tweet’s topic and add in new context to refute or support it) which would shift the topic distribution. Thus, KL divergence would increase while helpfulness also increases. This explanation has some weight because the group of notes that are labeled as adding context are on average longer than notes that are not. However, there may be more reasons that can’t be easily captured by a topic model: it’s possible that short notes share topics but are unhelpful (imagine a tweet that says ``The earth is flat!" and a note that uses a sarcasm indicator ``yes the the earth is flat! \verb|\|s").
 
-The answer to RQ2 is inconclusive. The method does seem to capture the extra context when considering a subset of data with \verb|Provides Important Context| in comparison to the full dataset. The relationship between $KL(N || T)$ and helpfulness for the notes that add context is weaker than in the full dataset. This may reflect that the labeled context-adding notes have less topic overlap but are still helpful. However, when considering the presence of the label as a binary variable, we get statistically insignificant results. This may be because the presence of a variable does not map perfectly to a binary trait. There may be a large amount of notes that add context but are not labeled as such.
+The answer to RQ2 is inconclusive. The method does seem to capture the extra context when considering a subset of data with \verb|Provides Important Context| labels in comparison to the full dataset.
+% The relationship between $KL(N || T)$ and helpfulness for the notes that add context is weaker than in the full dataset. This may reflect that the labeled context-adding notes have less topic overlap but are still helpful.
+However, when considering the presence of the label as a binary variable, we get statistically insignificant results. This may be because the presence of a variable does not map perfectly to a binary trait. There may be a large amount of helpful notes that add context but are not labeled as such.
 
 Document length creates difficulties with this method and the analysis of the research questions:
 
@@ -572,22 +579,23 @@ Document length creates difficulties with this method and the analysis of the re
     \item Finding the topic probabilities for short documents can result in uniform distributions without clear top topics
 \end{enumerate}
 
-It’s possible that (1) could be re-mediated by using a test set with more documents to fill out the word co-occurrence matrix. These issues are connected: if (1) was re-mediated, it may be possible to find the topics that clearly have the highest NPMI scores and use them to weed out “catch all” topics, forcing a less uniform distribution.
+It’s possible that (1) could be re-mediated by using a test set with more documents to fill out the word co-occurrence matrix. These issues are connected: if (1) was re-mediated, it may be possible to find the topics that clearly have the highest NPMI scores and use them to weed out “catch all” topics, forcing a less uniform distribution for short documents.
 
 Overall, the method by \cite{sia-etal-2020-tired} seems to work appropriately for the limited scope of these research questions. Given that this method aims to minimize computational complexity it’s possible that this could be used to find “troll” responses that are off-topic as they are created.
 
 \chapter{Ethical Considerations}\label{ethicalconsiderations}
 
-This thesis uses text data from Birdwatch without incorporating context from important conversations about the program itself. We intend any applications or future work that draw on this thesis to be considered alongside studies about the Birdwatch program and crowd-sourced fact-checking.
+This thesis uses text data from Birdwatch without incorporating important conversations about the program itself. We intend any applications or future work that draw on this thesis to be considered alongside studies about the Birdwatch program and crowd-sourced fact-checking.
 
-Following the guidelines from \cite{williams2017towards} and \cite{fiesler2018participant} we do not include specific note text, participant ids, tweet tweet, or Twitter handles. The data is considered only in aggregate. The title of this thesis is a play on a typical note.
+Following the guidelines from \cite{williams2017towards} and \cite{fiesler2018participant} we try to protect social media user's privacy and do not include specific note text, participant IDs, tweet IDs, or Twitter handles. We believe this practice is especially relevant for the Birdwatch dataset because of it's small size (tracking down the alias of note's author would be relatively easy). The data is considered only in aggregate. The title of this thesis is a play on a typical note.
 
 
 \chapter{Conclusion}
 
-This thesis examined topic overlap between Birdwatch notes and their associated tweets. The intuition behind this inquiry is quite simple: it makes sense that helpful fact-checks share topics with the content they are fact-checking. We examined this question using a method adopted from \cite{sia-etal-2020-tired} as an alternative to LDA and found that there is a statistically significant relationship between topic overlap ($KL(N || T$)) and helpfulness. This question was extended to try and find cases where notes add helpful additional context to a tweet with inconclusive results.
-While the methodology addressed the original research questions, future work and access to more data will be paramount for its use in applied settings.
-Future work may include researching a multilingual approach to capture the relationship between non-English tweets and their notes, using more tweet training data to increase word pair co-occurrences, and further work to understand how the Birdwatch annotation process may affect downstream tasks.
+This thesis examined topic overlap between Birdwatch notes and their associated tweets. We wanted to validate a reasonable assumption about fact-checking (that helpful fact-checks share topics with the content they are written about) and test for it with a topic model. We examined the research questions using a method adopted from \cite{sia-etal-2020-tired} as an alternative to LDA and found that there is a statistically significant relationship between topic overlap $KL(N || T$) and helpfulness. This question was extended to try establish the relationship where notes add helpful additional context to a tweet with inconclusive results.
+While the methodology addressed the original research questions, future work and access to more data will be necessary for this method's use in applied settings.
+
+Future work may include researching a multilingual approach to capture the relationship between non-English tweets and their notes, using more tweet training data to increase word pair co-occurrences (or using evaluation methods that don't require corpus statistics or distance metrics), and further work to understand how the Birdwatch annotation process may affect downstream tasks.
 
 
 
@@ -1154,8 +1162,8 @@ Future work may include researching a multilingual approach to capture the relat
 \raggedbottom\sloppy
  \begin{figure}[h]
 \centering
-\includegraphics[scale=0.23]{screenshot.jpg}
-\caption{A screenshot of the Birdwatch user interface that shows that different labels that can be applied to a note }
+\includegraphics[scale=0.2]{screenshot.jpg}
+\caption{A screenshot of the Birdwatch user interface that shows that different labels the can be applied to a note }
 \label{fig:labels}
 \end{figure}
 % ========== Appendix A
